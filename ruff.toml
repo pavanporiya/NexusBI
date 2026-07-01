@@ -1,0 +1,21 @@
+# Central Ruff Linter configuration
+line-length = 88
+target-version = "py313"
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort (import sorting)
+    "B",   # flake8-bugbear (common design issues)
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade (modern language checks)
+    "ARG", # flake8-unused-arguments
+    "PT",  # flake8-pytest-style
+]
+ignore = []
+
+[lint.isort]
+combine-as-imports = true
+force-single-line = false

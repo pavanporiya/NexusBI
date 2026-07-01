@@ -1,0 +1,51 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/ci-backend.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/ci-backend.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Astral uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Set up Python 3.13
+        run: uv python install 3.13
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('backend/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
+      - name: Run Ruff Linter
+        run: uv run --project backend ruff check .
+
+      - name: Run Ruff Formatter check
+        run: uv run --project backend ruff format --check .
+
+      - name: Run MyPy Type Checks
+        run: uv run --project backend mypy .
+
+      - name: Run Backend Tests
+        run: uv run --project backend pytest
+        env:
+          ENV: testing
+          DEBUG: true

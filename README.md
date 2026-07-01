@@ -95,10 +95,10 @@ NexusBI/
 
 | Layer | Technology | Justification |
 |:---|:---|:---|
-| **Backend** | Python 3.11 + FastAPI | Async-native, AI/ML ecosystem, auto OpenAPI docs |
-| **Frontend** | React 18 + Redux Toolkit + Tailwind CSS | Component reuse, predictable state, utility-first CSS |
+| **Backend** | Python 3.13 + FastAPI + uv | Async-native, high-speed Astral packaging, auto OpenAPI docs |
+| **Frontend** | React 19 + Next.js 15 + Redux Toolkit + Tailwind | Component reuse, React Server Components ready, predictable state |
 | **Visualization** | Apache ECharts | Single library, canvas rendering, rich interactivity |
-| **Database** | PostgreSQL 15 + pgvector | Metadata, audit logs, AND vector search in one DB |
+| **Database** | PostgreSQL 15 + pgvector | Metadata, audit logs, and vector search in one DB |
 | **Cache** | Redis (single instance) | Sessions, conversation memory, semantic query cache |
 | **Data Warehouse** | Snowflake | Target analytical database with native RLS/CLS |
 | **AI Orchestration** | LangGraph | Stateful agent workflows with self-healing loops |
@@ -110,14 +110,17 @@ NexusBI/
 
 ## 🚀 Pre-Development Checklist
 
-- [ ] All 15 ADRs documented and signed off
-- [ ] OpenAPI 3.1 specification defined for all V1 endpoints
-- [ ] Local dev Docker Compose file created and tested
+- [x] Python packaging migrated to high-speed Astral `uv` toolchains
+- [x] Local dev Docker Compose file created and verified (`postgres`, `redis`, `backend` containers)
+- [x] CI/CD pipelines configured (Lint, Format, Types, Unit tests) for backend, frontend, and dbt
+- [x] Workspace code quality and editor configs established (`ruff`, `mypy`, `pre-commit`, `.editorconfig`)
 - [ ] Snowflake dev account provisioned with sample data
 - [ ] OIDC test identity provider configured
 - [ ] Mock LLM response fixtures created for 20 test queries
 - [ ] KPI catalog loaded into PostgreSQL seed data
-- [ ] CI/CD pipeline configured (lint, test, build)
 - [ ] Error code registry (NBI-1001–1007) documented
 - [ ] Security threat model reviewed
 - [ ] SLI/SLO definitions agreed upon
+
+For detailed instructions on running, testing, and formatting this workspace, see the [Developer Setup Guide](./docs/developer/local_setup.md).
+
