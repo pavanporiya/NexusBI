@@ -20,12 +20,8 @@ class User:
     is_active: bool = True
     google_id: str | None = None
     roles: list[Role] = field(default_factory=list)
-    created_at: datetime = field(
-        default_factory=lambda: datetime.now(UTC)
-    )
-    updated_at: datetime = field(
-        default_factory=lambda: datetime.now(UTC)
-    )
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def has_permission(self, permission_name: str) -> bool:
         """Check if any of the user's assigned roles carry the specified permission."""

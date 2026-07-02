@@ -443,11 +443,13 @@ def register_exception_handlers(app: FastAPI) -> None:
         """Handle Pydantic request validation errors."""
         errors = []
         for error in exc.errors():
-            errors.append({
-                "field": ".".join(str(loc) for loc in error.get("loc", [])),
-                "message": error.get("msg", "Validation error"),
-                "type": error.get("type", "value_error"),
-            })
+            errors.append(
+                {
+                    "field": ".".join(str(loc) for loc in error.get("loc", [])),
+                    "message": error.get("msg", "Validation error"),
+                    "type": error.get("type", "value_error"),
+                }
+            )
 
         logger.warning(
             "Request validation failed",

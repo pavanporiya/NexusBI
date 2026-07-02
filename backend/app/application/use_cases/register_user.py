@@ -57,4 +57,6 @@ class RegisterUserUseCase:
             created_at=saved_user.created_at,
             updated_at=saved_user.updated_at,
         )
+
+
 class_name = "RegisterUserUseCase"

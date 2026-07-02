@@ -42,12 +42,8 @@ class Session:
     refresh_token: str
     expires_at: datetime
     is_revoked: bool = False
-    created_at: datetime = field(
-        default_factory=lambda: datetime.now(UTC)
-    )
-    updated_at: datetime = field(
-        default_factory=lambda: datetime.now(UTC)
-    )
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     client_ip: str | None = None
     user_agent: str | None = None
 

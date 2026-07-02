@@ -111,4 +111,6 @@ class RefreshTokenUseCase:
             refresh_token=new_refresh_token,
             expires_in=self._settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         )
+
+
 class_name = "RefreshTokenUseCase"

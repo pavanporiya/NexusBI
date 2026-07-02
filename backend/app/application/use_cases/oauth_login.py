@@ -47,9 +47,7 @@ class OAuthLoginUseCase:
             If OAuth validation fails or the account is disabled.
         """
         try:
-            google_profile = self._oauth_service.verify_auth_code(
-                code, redirect_uri
-            )
+            google_profile = self._oauth_service.verify_auth_code(code, redirect_uri)
         except Exception as exc:
             raise AuthenticationError(
                 "Google OAuth verification failed", detail=str(exc)
@@ -110,4 +108,6 @@ class OAuthLoginUseCase:
             refresh_token=refresh_token,
             expires_in=self._settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         )
+
+
 class_name = "OAuthLoginUseCase"

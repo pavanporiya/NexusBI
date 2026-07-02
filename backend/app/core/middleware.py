@@ -90,14 +90,16 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     Skips logging for health check endpoints to reduce noise.
     """
 
-    SKIP_PATHS: frozenset[str] = frozenset({
-        "/health",
-        "/live",
-        "/ready",
-        "/api/v1/health",
-        "/api/v1/health/live",
-        "/api/v1/health/ready",
-    })
+    SKIP_PATHS: frozenset[str] = frozenset(
+        {
+            "/health",
+            "/live",
+            "/ready",
+            "/api/v1/health",
+            "/api/v1/health/live",
+            "/api/v1/health/ready",
+        }
+    )
 
     async def dispatch(
         self,

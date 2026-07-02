@@ -34,4 +34,6 @@ class LogoutUserUseCase:
                 "Failed to process logout session revocation",
                 detail=str(exc),
             ) from exc
+
+
 class_name = "LogoutUserUseCase"

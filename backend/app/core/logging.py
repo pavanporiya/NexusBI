@@ -24,9 +24,7 @@ from structlog.types import EventDict, WrappedLogger
 # Correlation ID Context Variable
 # ---------------------------------------------------------------------------
 
-correlation_id_ctx: ContextVar[str] = ContextVar(
-    "correlation_id", default=""
-)
+correlation_id_ctx: ContextVar[str] = ContextVar("correlation_id", default="")
 
 
 def get_correlation_id() -> str:
@@ -76,8 +74,14 @@ def censor_sensitive_data(
 ) -> EventDict:
     """Redact known sensitive field values from log output."""
     sensitive_keys = {
-        "password", "secret", "token", "api_key", "authorization",
-        "secret_key", "access_token", "refresh_token",
+        "password",
+        "secret",
+        "token",
+        "api_key",
+        "authorization",
+        "secret_key",
+        "access_token",
+        "refresh_token",
     }
     for key in list(event_dict.keys()):
         if any(s in key.lower() for s in sensitive_keys):

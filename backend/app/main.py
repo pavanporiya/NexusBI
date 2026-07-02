@@ -111,21 +111,12 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.PROJECT_NAME,
         description=(
-            "Enterprise Analytics Copilot — AI-powered "
-            "business intelligence platform"
+            "Enterprise Analytics Copilot — AI-powered business intelligence platform"
         ),
         version=settings.VERSION,
         openapi_url=f"{settings.API_V1_STR}/openapi.json",
-        docs_url=(
-            f"{settings.API_V1_STR}/docs"
-            if settings.is_development
-            else None
-        ),
-        redoc_url=(
-            f"{settings.API_V1_STR}/redoc"
-            if settings.is_development
-            else None
-        ),
+        docs_url=(f"{settings.API_V1_STR}/docs" if settings.is_development else None),
+        redoc_url=(f"{settings.API_V1_STR}/redoc" if settings.is_development else None),
         lifespan=lifespan,
     )
 
