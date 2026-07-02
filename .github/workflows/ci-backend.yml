@@ -2,57 +2,77 @@ name: Backend CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'backend/**'
-      - '.github/workflows/ci-backend.yml'
+      - "backend/**"
+      - ".github/workflows/ci-backend.yml"
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'backend/**'
-      - '.github/workflows/ci-backend.yml'
+      - "backend/**"
+      - ".github/workflows/ci-backend.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
+  backend:
+    name: Backend Quality Gate
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     defaults:
       run:
         working-directory: backend
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Astral uv
+      - name: Install uv
         uses: astral-sh/setup-uv@v3
-        with:
-          version: "latest"
 
-      - name: Set up Python 3.13
+      - name: Setup Python
         run: uv python install 3.13
 
-      - name: Cache dependencies
+      - name: Restore uv cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/uv
-          key: ${{ runner.os }}-uv-${{ hashFiles('backend/pyproject.toml', 'backend/uv.lock') }}
+          path: |
+            ~/.cache/uv
+            backend/.venv
+          key: backend-${{ runner.os }}-${{ hashFiles('backend/pyproject.toml', 'backend/uv.lock') }}
           restore-keys: |
-            ${{ runner.os }}-uv-
+            backend-${{ runner.os }}-
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --frozen
 
-      - name: Run Ruff Linter
+      - name: Ruff Lint
         run: uv run ruff check .
 
-      - name: Run Ruff Formatter check
+      - name: Ruff Format Check
         run: uv run ruff format --check .
 
-      - name: Run MyPy Type Checks
+      - name: MyPy
         run: uv run mypy .
 
-      - name: Run Backend Tests
+      - name: Pytest
         run: uv run pytest
-        env:
-          ENV: testing
-          DEBUG: true
+
+      - name: Verify project imports
+        run: |
+          uv run python -m compileall app
+
+      - name: Upload pytest artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-artifacts
+          path: |
+            backend/.pytest_cache
+          if-no-files-found: ignore
