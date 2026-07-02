@@ -12,9 +12,23 @@ on:
       - 'dbt/**'
       - '.github/workflows/ci-dbt.yml'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: dbt-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   compile:
+    name: dbt Compile
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    defaults:
+      run:
+        working-directory: dbt
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,9 +42,12 @@ jobs:
         run: uv python install 3.13
 
       - name: Install dbt
-        run: uv pip install --system dbt-core dbt-snowflake
-
-      - name: dbt Compile check
         run: |
-          cd dbt
-          dbt compile --profiles-dir .
+          uv venv
+          uv pip install dbt-core dbt-snowflake
+
+      - name: Install dbt packages
+        run: dbt deps --profiles-dir .
+
+      - name: Compile dbt project
+        run: dbt compile --profiles-dir .
