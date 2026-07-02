@@ -6,6 +6,8 @@ sensitive data censoring, and audit logger functionality.
 
 from __future__ import annotations
 
+from typing import Any
+
 
 class TestCorrelationID:
     """Tests for correlation ID context management."""
@@ -50,28 +52,28 @@ class TestSensitiveDataCensoring:
         from app.core.logging import censor_sensitive_data
 
         event = {"event": "test", "password": "secret123"}
-        result = censor_sensitive_data(None, "info", event)  # type: ignore[arg-type]
+        result = censor_sensitive_data(None, "info", event)
         assert result["password"] == "***REDACTED***"
 
     def test_api_key_field_is_redacted(self) -> None:
         from app.core.logging import censor_sensitive_data
 
         event = {"event": "test", "api_key": "sk-abc123"}
-        result = censor_sensitive_data(None, "info", event)  # type: ignore[arg-type]
+        result = censor_sensitive_data(None, "info", event)
         assert result["api_key"] == "***REDACTED***"
 
     def test_token_field_is_redacted(self) -> None:
         from app.core.logging import censor_sensitive_data
 
         event = {"event": "test", "access_token": "jwt.payload.sig"}
-        result = censor_sensitive_data(None, "info", event)  # type: ignore[arg-type]
+        result = censor_sensitive_data(None, "info", event)
         assert result["access_token"] == "***REDACTED***"
 
     def test_non_sensitive_field_is_preserved(self) -> None:
         from app.core.logging import censor_sensitive_data
 
         event = {"event": "test", "user_id": "user-123"}
-        result = censor_sensitive_data(None, "info", event)  # type: ignore[arg-type]
+        result = censor_sensitive_data(None, "info", event)
         assert result["user_id"] == "user-123"
 
 
@@ -81,15 +83,15 @@ class TestServiceContext:
     def test_adds_service_name(self) -> None:
         from app.core.logging import add_service_context
 
-        event: dict = {"event": "test"}
-        result = add_service_context(None, "info", event)  # type: ignore[arg-type]
+        event: dict[str, Any] = {"event": "test"}
+        result = add_service_context(None, "info", event)
         assert result["service"] == "nexusbi-backend"
 
     def test_does_not_override_existing_service(self) -> None:
         from app.core.logging import add_service_context
 
-        event: dict = {"event": "test", "service": "custom-service"}
-        result = add_service_context(None, "info", event)  # type: ignore[arg-type]
+        event: dict[str, Any] = {"event": "test", "service": "custom-service"}
+        result = add_service_context(None, "info", event)
         assert result["service"] == "custom-service"
 
 

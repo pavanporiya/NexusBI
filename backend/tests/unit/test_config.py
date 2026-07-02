@@ -12,23 +12,25 @@ from unittest.mock import patch
 import pytest
 from pydantic import SecretStr
 
+from app.core.config import Settings
+
 
 class TestSettingsDefaults:
     """Tests for default configuration values."""
 
-    def test_project_name_default(self, test_settings) -> None:
+    def test_project_name_default(self, test_settings: Settings) -> None:
         assert test_settings.PROJECT_NAME == "NexusBI Backend"
 
-    def test_api_prefix_default(self, test_settings) -> None:
+    def test_api_prefix_default(self, test_settings: Settings) -> None:
         assert test_settings.API_V1_STR == "/api/v1"
 
-    def test_version_default(self, test_settings) -> None:
+    def test_version_default(self, test_settings: Settings) -> None:
         assert test_settings.VERSION == "1.0.0"
 
-    def test_max_query_row_limit(self, test_settings) -> None:
+    def test_max_query_row_limit(self, test_settings: Settings) -> None:
         assert test_settings.MAX_QUERY_ROW_LIMIT == 50_000
 
-    def test_max_query_text_length(self, test_settings) -> None:
+    def test_max_query_text_length(self, test_settings: Settings) -> None:
         assert test_settings.MAX_QUERY_TEXT_LENGTH == 2_000
 
 
@@ -80,12 +82,12 @@ class TestSettingsValidation:
 class TestSettingsProperties:
     """Tests for computed properties."""
 
-    def test_postgres_dsn_format(self, test_settings) -> None:
+    def test_postgres_dsn_format(self, test_settings: Settings) -> None:
         dsn = test_settings.postgres_dsn
         assert dsn.startswith("postgresql+psycopg2://")
         assert test_settings.POSTGRES_DB in dsn
 
-    def test_redis_url_format(self, test_settings) -> None:
+    def test_redis_url_format(self, test_settings: Settings) -> None:
         url = test_settings.redis_url
         assert url.startswith("redis://")
 
@@ -111,17 +113,17 @@ class TestSettingsProperties:
 class TestSecretHandling:
     """Tests for sensitive value handling."""
 
-    def test_secret_key_is_secret_str(self, test_settings) -> None:
+    def test_secret_key_is_secret_str(self, test_settings: Settings) -> None:
         assert isinstance(test_settings.SECRET_KEY, SecretStr)
 
-    def test_postgres_password_is_secret_str(self, test_settings) -> None:
+    def test_postgres_password_is_secret_str(self, test_settings: Settings) -> None:
         assert isinstance(test_settings.POSTGRES_PASSWORD, SecretStr)
 
-    def test_secret_str_repr_is_masked(self, test_settings) -> None:
+    def test_secret_str_repr_is_masked(self, test_settings: Settings) -> None:
         repr_str = repr(test_settings.SECRET_KEY)
         assert "**********" in repr_str
 
-    def test_secret_value_accessible(self, test_settings) -> None:
+    def test_secret_value_accessible(self, test_settings: Settings) -> None:
         value = test_settings.SECRET_KEY.get_secret_value()
         assert isinstance(value, str)
         assert len(value) > 0

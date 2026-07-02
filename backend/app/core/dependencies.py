@@ -18,7 +18,7 @@ from __future__ import annotations
 from collections.abc import Generator
 
 from dependency_injector import containers, providers
-from sqlalchemy import create_engine
+from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from app.core.config import Settings, get_settings
@@ -38,7 +38,7 @@ Base = declarative_base()
 # ---------------------------------------------------------------------------
 
 
-def _create_engine(settings: Settings):  # type: ignore[no-untyped-def]
+def _create_engine(settings: Settings) -> Engine:
     """Create a SQLAlchemy engine from application settings."""
     return create_engine(
         settings.postgres_dsn,
@@ -51,7 +51,7 @@ def _create_engine(settings: Settings):  # type: ignore[no-untyped-def]
     )
 
 
-def _create_session_factory(engine):  # type: ignore[no-untyped-def]
+def _create_session_factory(engine: Engine) -> sessionmaker[Session]:
     """Create a SQLAlchemy session factory bound to the engine."""
     return sessionmaker(
         autocommit=False,

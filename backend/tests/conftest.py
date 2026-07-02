@@ -13,11 +13,14 @@ from collections.abc import Generator
 from unittest.mock import MagicMock
 
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
+from app.core.config import Settings
 
 
 @pytest.fixture(scope="session")
-def test_settings():
+def test_settings() -> Generator[Settings]:
     """Provide test-specific settings overrides."""
     import os
 
@@ -47,7 +50,7 @@ def mock_db_session() -> MagicMock:
 
 
 @pytest.fixture
-def app(test_settings, mock_db_session):  # noqa: ARG001
+def app(test_settings: Settings, mock_db_session: MagicMock) -> Generator[FastAPI]:  # noqa: ARG001
     """Create a test application instance with mocked dependencies."""
     from app.core.config import get_settings
 
@@ -58,7 +61,7 @@ def app(test_settings, mock_db_session):  # noqa: ARG001
 
     application = create_app()
 
-    def override_get_db():
+    def override_get_db() -> Generator[MagicMock]:
         try:
             yield mock_db_session
         finally:
@@ -72,7 +75,7 @@ def app(test_settings, mock_db_session):  # noqa: ARG001
 
 
 @pytest.fixture
-def client(app) -> Generator[TestClient]:
+def client(app: FastAPI) -> Generator[TestClient]:
     """Provide an HTTP test client bound to the test application."""
     with TestClient(app) as test_client:
         yield test_client

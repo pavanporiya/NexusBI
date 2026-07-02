@@ -183,16 +183,16 @@ class Settings(BaseSettings):
     def validate_environment(cls, v: Any) -> str:
         """Normalise environment string to lowercase."""
         if isinstance(v, str):
-            v = v.strip().lower()
-        return v
+            return v.strip().lower()
+        return str(v)
 
     @field_validator("LOG_LEVEL", mode="before")
     @classmethod
     def validate_log_level(cls, v: Any) -> str:
         """Normalise log level string to uppercase."""
         if isinstance(v, str):
-            v = v.strip().upper()
-        return v
+            return v.strip().upper()
+        return str(v)
 
     @field_validator("POSTGRES_PORT", "REDIS_PORT", "PORT", mode="before")
     @classmethod
