@@ -1,0 +1,60 @@
+# NexusBI Feature Flags Configuration
+# Architecture Reference: phase2_1_repository_blueprint.md Section 5.3
+#
+# Feature flags control runtime behavior without code changes.
+# Loaded at FastAPI startup and parsed into Pydantic models.
+
+features:
+  # AI-powered natural language query pipeline
+  enable_chat:
+    description: "Enable the AI-powered natural language query chat interface"
+    default: true
+    rollout_percentage: 100
+
+  # Statistical time-series forecasting (Prophet)
+  enable_forecasting:
+    description: "Enable Prophet-based time-series forecasting"
+    default: true
+    rollout_percentage: 100
+
+  # AI-generated business recommendations
+  enable_recommendations:
+    description: "Enable AI-generated business insight recommendations"
+    default: false
+    rollout_percentage: 10
+
+  # Semantic query caching (Redis + pgvector)
+  enable_semantic_cache:
+    description: "Enable semantic similarity caching for repeated queries"
+    default: false
+    rollout_percentage: 0
+
+  # LLM provider failover
+  use_fallback_llm:
+    description: "Force routing to fallback LLM provider (OpenAI)"
+    default: false
+    rollout_percentage: 0
+
+  # Dashboard pinning and export
+  enable_dashboard_export:
+    description: "Enable dashboard CSV and PNG export functionality"
+    default: true
+    rollout_percentage: 100
+
+  # Anomaly detection alerts
+  enable_anomaly_alerts:
+    description: "Enable automated anomaly detection and alerting"
+    default: false
+    rollout_percentage: 0
+
+  # Audit logging to PostgreSQL
+  enable_audit_logging:
+    description: "Enable SOC 2 compliant audit logging"
+    default: true
+    rollout_percentage: 100
+
+  # Request-level metrics (Prometheus)
+  enable_metrics:
+    description: "Enable Prometheus metrics endpoint"
+    default: false
+    rollout_percentage: 0

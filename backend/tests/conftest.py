@@ -1,0 +1,78 @@
+"""NexusBI Test Configuration and Fixtures.
+
+Provides shared pytest fixtures for the backend test suite:
+- Test application instance
+- HTTP test client
+- Database session mocking
+- Settings overrides for testing environment
+"""
+
+from __future__ import annotations
+
+from typing import Generator
+from unittest.mock import MagicMock
+
+import pytest
+from fastapi.testclient import TestClient
+
+
+@pytest.fixture(scope="session")
+def test_settings():
+    """Provide test-specific settings overrides."""
+    import os
+
+    os.environ["ENV"] = "testing"
+    os.environ["DEBUG"] = "true"
+    os.environ["PROJECT_NAME"] = "NexusBI Backend"
+    os.environ["SECRET_KEY"] = "test_secret_key_not_for_production"
+    os.environ["POSTGRES_HOST"] = "localhost"
+    os.environ["POSTGRES_DB"] = "nexusbi_testing"
+    os.environ["ENABLE_REQUEST_LOGGING"] = "true"
+
+    from app.core.config import get_settings
+
+    get_settings.cache_clear()
+    settings = get_settings()
+    yield settings
+
+    get_settings.cache_clear()
+
+
+@pytest.fixture()
+def mock_db_session() -> Generator[MagicMock, None, None]:
+    """Provide a mock database session for unit tests."""
+    session = MagicMock()
+    session.execute.return_value = MagicMock()
+    yield session
+
+
+@pytest.fixture()
+def app(test_settings, mock_db_session):
+    """Create a test application instance with mocked dependencies."""
+    from app.core.config import get_settings
+
+    get_settings.cache_clear()
+
+    from app.core.dependencies import get_db
+    from app.main import create_app
+
+    application = create_app()
+
+    def override_get_db():
+        try:
+            yield mock_db_session
+        finally:
+            mock_db_session.close()
+
+    application.dependency_overrides[get_db] = override_get_db
+
+    yield application
+
+    application.dependency_overrides.clear()
+
+
+@pytest.fixture()
+def client(app) -> Generator[TestClient, None, None]:
+    """Provide an HTTP test client bound to the test application."""
+    with TestClient(app) as test_client:
+        yield test_client

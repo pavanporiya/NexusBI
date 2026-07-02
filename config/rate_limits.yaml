@@ -1,0 +1,62 @@
+# NexusBI Rate Limiting Configuration
+# Architecture Reference: phase2_3_api_service_blueprint.md Section 2
+#
+# Defines request rate limits by user role and endpoint category.
+# Limits are enforced per-user using sliding window counters.
+
+defaults:
+  window_seconds: 60
+  strategy: sliding_window
+
+tiers:
+  # Standard authenticated users
+  standard:
+    description: "Default rate limits for authenticated users"
+    limits:
+      api_requests_per_minute: 60
+      chat_messages_per_minute: 30
+      forecast_requests_per_minute: 10
+      dashboard_requests_per_minute: 30
+      export_requests_per_minute: 5
+
+  # Power users / Business Analysts
+  analyst:
+    description: "Elevated limits for analyst roles"
+    limits:
+      api_requests_per_minute: 120
+      chat_messages_per_minute: 60
+      forecast_requests_per_minute: 20
+      dashboard_requests_per_minute: 60
+      export_requests_per_minute: 10
+
+  # Admin users
+  admin:
+    description: "Administrative access with higher limits"
+    limits:
+      api_requests_per_minute: 300
+      chat_messages_per_minute: 120
+      forecast_requests_per_minute: 50
+      dashboard_requests_per_minute: 120
+      export_requests_per_minute: 30
+
+  # Service accounts (machine-to-machine)
+  service:
+    description: "Service account limits for API integrations"
+    limits:
+      api_requests_per_minute: 600
+      chat_messages_per_minute: 0
+      forecast_requests_per_minute: 100
+      dashboard_requests_per_minute: 300
+      export_requests_per_minute: 50
+
+# Endpoint-specific overrides (applied regardless of tier)
+endpoint_overrides:
+  health:
+    path_prefix: "/health"
+    max_requests_per_minute: 300
+    exempt: true
+
+  openapi:
+    path_prefix: "/api/v1/docs"
+    max_requests_per_minute: 30
+    exempt: false

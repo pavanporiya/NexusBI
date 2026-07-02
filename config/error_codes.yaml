@@ -1,0 +1,121 @@
+# NexusBI Error Code Registry
+# Architecture Reference: phase2_3_api_service_blueprint.md Section 5.2
+#
+# Error codes follow the pattern NBI-XXXX:
+#   NBI-1xxx → Validation / Authentication / Authorization
+#   NBI-2xxx → AI Platform (LLM, SQL generation)
+#   NBI-3xxx → Data Warehouse (Snowflake)
+#   NBI-4xxx → Domain (Entity, Business Rule)
+#   NBI-5xxx → Infrastructure (Database, Cache, External Service)
+#   NBI-9999 → Unhandled / Unknown
+
+categories:
+  validation:
+    NBI-1001:
+      http_status: 400
+      category: Validation
+      description: "Request validation failed — missing parameters or bad formatting."
+      user_message: "The request could not be processed due to invalid input."
+
+  authentication:
+    NBI-1002:
+      http_status: 401
+      category: Security
+      description: "JWT authentication failed or token has expired."
+      user_message: "Your session has expired. Please sign in again."
+
+  authorization:
+    NBI-1003:
+      http_status: 403
+      category: Security
+      description: "User does not have permission to access the requested resource."
+      user_message: "You do not have permission to perform this action."
+
+  ai_platform:
+    NBI-2001:
+      http_status: 504
+      category: AI Platform
+      description: "Primary and fallback LLM services failed to respond within limits."
+      user_message: "Our AI service is temporarily unavailable. Please try again."
+
+    NBI-2002:
+      http_status: 422
+      category: AI Platform
+      description: "Generated SQL failed AST security validation checks."
+      user_message: "We could not generate a safe query for your request."
+
+    NBI-2003:
+      http_status: 400
+      category: AI Platform
+      description: "Input contains suspected prompt injection content."
+      user_message: "Your input was flagged by our security filter."
+
+  warehouse:
+    NBI-3001:
+      http_status: 500
+      category: Warehouse
+      description: "Snowflake execution failed due to SQL syntax or database errors."
+      user_message: "We encountered an error running your query."
+
+    NBI-3002:
+      http_status: 504
+      category: Warehouse
+      description: "Snowflake query timed out before execution completed."
+      user_message: "Your query took too long to complete. Try narrowing your request."
+
+    NBI-3003:
+      http_status: 503
+      category: Warehouse
+      description: "Could not establish a connection to the data warehouse."
+      user_message: "The data warehouse is temporarily unreachable."
+
+  domain:
+    NBI-4001:
+      http_status: 404
+      category: Domain
+      description: "Requested entity does not exist."
+      user_message: "The requested resource was not found."
+
+    NBI-4002:
+      http_status: 409
+      category: Domain
+      description: "Entity already exists (uniqueness constraint violation)."
+      user_message: "A resource with this identifier already exists."
+
+    NBI-4003:
+      http_status: 422
+      category: Domain
+      description: "A domain business rule was violated."
+      user_message: "The operation violates a business constraint."
+
+  infrastructure:
+    NBI-5001:
+      http_status: 500
+      category: Infrastructure
+      description: "Internal PostgreSQL metadata database error."
+      user_message: "An internal error occurred. Please try again."
+
+    NBI-5002:
+      http_status: 500
+      category: Infrastructure
+      description: "Redis cache operation failure."
+      user_message: "An internal error occurred. Please try again."
+
+    NBI-5003:
+      http_status: 503
+      category: Infrastructure
+      description: "An external service dependency failed."
+      user_message: "A required service is temporarily unavailable."
+
+    NBI-5004:
+      http_status: 429
+      category: Infrastructure
+      description: "Client has exceeded the allowed request rate."
+      user_message: "Too many requests. Please wait a moment and try again."
+
+  unhandled:
+    NBI-9999:
+      http_status: 500
+      category: System
+      description: "Unhandled or unknown server error."
+      user_message: "An unexpected error occurred. Our team has been notified."
