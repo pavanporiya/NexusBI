@@ -19,3 +19,6 @@ ignore = []
 [lint.isort]
 combine-as-imports = true
 force-single-line = false
+
+[lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "Depends"]

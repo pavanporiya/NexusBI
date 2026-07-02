@@ -20,9 +20,8 @@ from __future__ import annotations
 import platform
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
-from typing import Any
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
@@ -42,7 +41,7 @@ router = APIRouter()
 # ---------------------------------------------------------------------------
 
 _SERVICE_START_TIME = time.monotonic()
-_SERVICE_START_UTC = datetime.now(timezone.utc)
+_SERVICE_START_UTC = datetime.now(UTC)
 
 
 # ---------------------------------------------------------------------------
@@ -141,7 +140,9 @@ def _check_postgres(db: Session) -> ComponentHealth:
     "/health",
     response_model=HealthResponse,
     summary="System Health Check",
-    description="Returns a comprehensive health report including all dependency checks.",
+    description=(
+        "Returns a comprehensive health report including all dependency checks."
+    ),
 )
 async def health_check(db: Session = Depends(get_db)) -> HealthResponse:
     """Comprehensive system health check.
@@ -174,7 +175,7 @@ async def health_check(db: Session = Depends(get_db)) -> HealthResponse:
         status=overall,
         service=settings.PROJECT_NAME,
         environment=settings.ENV.value,
-        timestamp=datetime.now(timezone.utc).isoformat(),
+        timestamp=datetime.now(UTC).isoformat(),
         uptime_seconds=round(uptime, 2),
         checks=checks,
     )
@@ -184,7 +185,10 @@ async def health_check(db: Session = Depends(get_db)) -> HealthResponse:
     "/health/live",
     response_model=LivenessResponse,
     summary="Liveness Probe",
-    description="Lightweight check to verify the service process is alive. Used by Kubernetes liveness probes.",
+    description=(
+        "Lightweight check to verify the service process is alive. "
+        "Used by Kubernetes liveness probes."
+    ),
 )
 @router.get(
     "/live",
@@ -200,7 +204,7 @@ async def liveness_check() -> LivenessResponse:
     settings = get_settings()
     return LivenessResponse(
         service=settings.PROJECT_NAME,
-        timestamp=datetime.now(timezone.utc).isoformat(),
+        timestamp=datetime.now(UTC).isoformat(),
     )
 
 
@@ -208,7 +212,10 @@ async def liveness_check() -> LivenessResponse:
     "/health/ready",
     response_model=ReadinessResponse,
     summary="Readiness Probe",
-    description="Verifies all critical dependencies are available. Used by Kubernetes readiness probes and load balancers.",
+    description=(
+        "Verifies all critical dependencies are available. "
+        "Used by Kubernetes readiness probes and load balancers."
+    ),
 )
 @router.get(
     "/ready",

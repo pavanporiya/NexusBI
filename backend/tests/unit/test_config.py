@@ -55,18 +55,22 @@ class TestSettingsValidation:
         assert s.LOG_LEVEL.value == "DEBUG"
 
     def test_invalid_port_raises_error(self) -> None:
+        from pydantic import ValidationError
+
         from app.core.config import Settings
 
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             Settings(
                 PORT=99999,
                 SECRET_KEY=SecretStr("test"),
             )
 
     def test_negative_token_expiry_raises_error(self) -> None:
+        from pydantic import ValidationError
+
         from app.core.config import Settings
 
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             Settings(
                 ACCESS_TOKEN_EXPIRE_MINUTES=-1,
                 SECRET_KEY=SecretStr("test"),

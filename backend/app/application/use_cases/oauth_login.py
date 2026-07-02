@@ -3,8 +3,8 @@
 Exchanges OAuth credentials with Google and returns user tokens.
 """
 
-from datetime import datetime, timedelta, timezone
 import uuid
+from datetime import UTC, datetime, timedelta
 
 from app.application.dto.auth_dto import TokenDTO
 from app.application.services.interfaces import IGoogleOAuthService, ITokenService
@@ -47,9 +47,13 @@ class OAuthLoginUseCase:
             If OAuth validation fails or the account is disabled.
         """
         try:
-            google_profile = self._oauth_service.verify_auth_code(code, redirect_uri)
+            google_profile = self._oauth_service.verify_auth_code(
+                code, redirect_uri
+            )
         except Exception as exc:
-            raise AuthenticationError("Google OAuth verification failed", detail=str(exc)) from exc
+            raise AuthenticationError(
+                "Google OAuth verification failed", detail=str(exc)
+            ) from exc
 
         # 1. Retrieve user by Google ID or Email
         user = self._user_repo.get_by_google_id(google_profile.google_id)
@@ -69,7 +73,7 @@ class OAuthLoginUseCase:
             else:
                 # ── Link Google ID to existing account ───────────────────
                 user.google_id = google_profile.google_id
-                user.updated_at = datetime.now(timezone.utc)
+                user.updated_at = datetime.now(UTC)
                 user = self._user_repo.save(user)
 
         if not user.is_active:
@@ -87,7 +91,7 @@ class OAuthLoginUseCase:
             token_id=token_id,
         )
 
-        expiry = datetime.now(timezone.utc) + timedelta(
+        expiry = datetime.now(UTC) + timedelta(
             days=self._settings.REFRESH_TOKEN_EXPIRE_DAYS
         )
         session = Session(

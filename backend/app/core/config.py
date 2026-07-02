@@ -21,7 +21,6 @@ from typing import Any
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -214,7 +213,7 @@ class Settings(BaseSettings):
         return val
 
     @model_validator(mode="after")
-    def validate_production_secrets(self) -> "Settings":
+    def validate_production_secrets(self) -> Settings:
         """Enforce that production and staging environments have real secrets."""
         if self.ENV in (Environment.PRODUCTION, Environment.STAGING):
             secret_value = self.SECRET_KEY.get_secret_value()
@@ -226,7 +225,7 @@ class Settings(BaseSettings):
         return self
 
     @model_validator(mode="after")
-    def set_debug_defaults(self) -> "Settings":
+    def set_debug_defaults(self) -> Settings:
         """Auto-configure debug-related settings by environment."""
         if self.ENV == Environment.DEVELOPMENT:
             object.__setattr__(self, "DEBUG", True)

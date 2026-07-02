@@ -5,7 +5,7 @@ or externally via Google OAuth.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from app.domain.entities.role import Role
 
@@ -21,10 +21,10 @@ class User:
     google_id: str | None = None
     roles: list[Role] = field(default_factory=list)
     created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
+        default_factory=lambda: datetime.now(UTC)
     )
     updated_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
+        default_factory=lambda: datetime.now(UTC)
     )
 
     def has_permission(self, permission_name: str) -> bool:
@@ -38,7 +38,7 @@ class User:
         for role in self.roles:
             for perm in role.permissions:
                 names.add(perm.name)
-        return sorted(list(names))
+        return sorted(names)
 
     @property
     def role_names(self) -> list[str]:

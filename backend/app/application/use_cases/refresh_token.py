@@ -3,8 +3,8 @@
 Implements refresh token rotation (RTR) and automatic session revocation on token reuse.
 """
 
-from datetime import datetime, timedelta, timezone
 import uuid
+from datetime import UTC, datetime, timedelta
 
 from app.application.dto.auth_dto import TokenDTO, TokenRefreshDTO
 from app.application.services.interfaces import ITokenService
@@ -62,7 +62,10 @@ class RefreshTokenUseCase:
             self._session_repo.revoke_all_user_sessions(user_id)
             raise AuthenticationError(
                 "Compromised credentials session refresh rejected",
-                detail="Token reuse detected. All active user sessions have been terminated.",
+                detail=(
+                    "Token reuse detected. All active user sessions "
+                    "have been terminated."
+                ),
             )
 
         if session is None or not session.is_valid:
@@ -89,7 +92,7 @@ class RefreshTokenUseCase:
         )
 
         # 3. Save new session in database
-        expiry = datetime.now(timezone.utc) + timedelta(
+        expiry = datetime.now(UTC) + timedelta(
             days=self._settings.REFRESH_TOKEN_EXPIRE_DAYS
         )
         new_session = Session(

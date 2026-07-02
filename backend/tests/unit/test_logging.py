@@ -6,8 +6,6 @@ sensitive data censoring, and audit logger functionality.
 
 from __future__ import annotations
 
-import pytest
-
 
 class TestCorrelationID:
     """Tests for correlation ID context management."""

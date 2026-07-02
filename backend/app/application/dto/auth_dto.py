@@ -1,10 +1,12 @@
 """Authentication Data Transfer Objects (DTOs).
 
-Defines serialization, validation, and type boundaries for application layer inputs and outputs.
+Defines serialization, validation, and type boundaries for
+application layer inputs and outputs.
 Uses Pydantic v2.
 """
 
 from datetime import datetime
+
 from pydantic import BaseModel, EmailStr, Field
 
 

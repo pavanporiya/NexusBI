@@ -15,7 +15,7 @@ Architecture Reference:
 
 from __future__ import annotations
 
-from typing import Generator
+from collections.abc import Generator
 
 from dependency_injector import containers, providers
 from sqlalchemy import create_engine
@@ -60,7 +60,7 @@ def _create_session_factory(engine):  # type: ignore[no-untyped-def]
     )
 
 
-def get_db() -> Generator[Session, None, None]:
+def get_db() -> Generator[Session]:
     """FastAPI dependency that yields a scoped database session.
 
     The session is automatically closed after the request completes,

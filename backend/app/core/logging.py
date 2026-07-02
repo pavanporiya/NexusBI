@@ -54,7 +54,7 @@ def reset_correlation_id() -> None:
 
 
 def add_correlation_id(
-    logger: WrappedLogger, method_name: str, event_dict: EventDict
+    _logger: WrappedLogger, _method_name: str, event_dict: EventDict
 ) -> EventDict:
     """Inject the current correlation ID into every log entry."""
     cid = correlation_id_ctx.get("")
@@ -64,7 +64,7 @@ def add_correlation_id(
 
 
 def add_service_context(
-    logger: WrappedLogger, method_name: str, event_dict: EventDict
+    _logger: WrappedLogger, _method_name: str, event_dict: EventDict
 ) -> EventDict:
     """Inject standard service metadata into every log entry."""
     event_dict.setdefault("service", "nexusbi-backend")
@@ -72,7 +72,7 @@ def add_service_context(
 
 
 def censor_sensitive_data(
-    logger: WrappedLogger, method_name: str, event_dict: EventDict
+    _logger: WrappedLogger, _method_name: str, event_dict: EventDict
 ) -> EventDict:
     """Redact known sensitive field values from log output."""
     sensitive_keys = {
@@ -92,7 +92,7 @@ def censor_sensitive_data(
 
 def configure_logging(
     log_level: int = logging.INFO,
-    json_output: bool = True,
+    json_output: bool = True,  # noqa: ARG001
     environment: str = "production",
 ) -> None:
     """Configure the global logging infrastructure.
@@ -101,7 +101,7 @@ def configure_logging(
     ----------
     log_level:
         The stdlib logging level (e.g., logging.DEBUG).
-    json_output:
+    _json_output:
         If True, emit structured JSON logs. If False, emit
         human-readable console output.
     environment:
@@ -165,7 +165,9 @@ def configure_logging(
 # ---------------------------------------------------------------------------
 
 
-def get_logger(name: str | None = None, **initial_context: Any) -> structlog.stdlib.BoundLogger:
+def get_logger(
+    name: str | None = None, **initial_context: Any
+) -> structlog.stdlib.BoundLogger:
     """Return a bound structlog logger with optional initial context.
 
     Parameters

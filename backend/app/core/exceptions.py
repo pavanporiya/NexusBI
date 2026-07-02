@@ -11,7 +11,7 @@ Architecture Reference:
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import FastAPI, Request
@@ -46,7 +46,7 @@ def _build_error_response(
             "code": code,
             "message": message,
             "detail": detail or message,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         },
     }
     if errors:
@@ -241,7 +241,10 @@ class UnsafeSQLError(SQLValidationError):
     def __init__(self, statement_type: str) -> None:
         super().__init__(
             message="Unsafe SQL statement detected",
-            detail=f"Statement type '{statement_type}' is not allowed. Only SELECT is permitted.",
+            detail=(
+                f"Statement type '{statement_type}' is not allowed. "
+                "Only SELECT is permitted."
+            ),
         )
 
 
@@ -507,7 +510,10 @@ def register_exception_handlers(app: FastAPI) -> None:
 
         from app.core.config import settings
 
-        detail = str(exc) if settings.is_development else "An unexpected error occurred."
+        if settings.is_development:
+            detail = str(exc)
+        else:
+            detail = "An unexpected error occurred."
 
         return _build_error_response(
             status_code=500,

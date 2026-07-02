@@ -5,7 +5,7 @@ and device tracking without a central in-memory store like Redis in Version 1.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 @dataclass
@@ -43,10 +43,10 @@ class Session:
     expires_at: datetime
     is_revoked: bool = False
     created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
+        default_factory=lambda: datetime.now(UTC)
     )
     updated_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
+        default_factory=lambda: datetime.now(UTC)
     )
     client_ip: str | None = None
     user_agent: str | None = None
@@ -54,7 +54,7 @@ class Session:
     @property
     def is_expired(self) -> bool:
         """Check if the session has exceeded its expiration date."""
-        return datetime.now(timezone.utc) >= self.expires_at
+        return datetime.now(UTC) >= self.expires_at
 
     @property
     def is_valid(self) -> bool:

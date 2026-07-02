@@ -9,7 +9,7 @@ Provides shared pytest fixtures for the backend test suite:
 
 from __future__ import annotations
 
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import MagicMock
 
 import pytest
@@ -38,16 +38,16 @@ def test_settings():
     get_settings.cache_clear()
 
 
-@pytest.fixture()
-def mock_db_session() -> Generator[MagicMock, None, None]:
+@pytest.fixture
+def mock_db_session() -> MagicMock:
     """Provide a mock database session for unit tests."""
     session = MagicMock()
     session.execute.return_value = MagicMock()
-    yield session
+    return session
 
 
-@pytest.fixture()
-def app(test_settings, mock_db_session):
+@pytest.fixture
+def app(test_settings, mock_db_session):  # noqa: ARG001
     """Create a test application instance with mocked dependencies."""
     from app.core.config import get_settings
 
@@ -71,8 +71,8 @@ def app(test_settings, mock_db_session):
     application.dependency_overrides.clear()
 
 
-@pytest.fixture()
-def client(app) -> Generator[TestClient, None, None]:
+@pytest.fixture
+def client(app) -> Generator[TestClient]:
     """Provide an HTTP test client bound to the test application."""
     with TestClient(app) as test_client:
         yield test_client

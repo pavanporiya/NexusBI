@@ -3,8 +3,8 @@
 Orchestrates user authentication via credentials and establishes active sessions.
 """
 
-from datetime import datetime, timedelta, timezone
 import uuid
+from datetime import UTC, datetime, timedelta
 
 from app.application.dto.auth_dto import LoginDTO, TokenDTO
 from app.application.services.interfaces import IPasswordHasher, ITokenService
@@ -67,7 +67,7 @@ class LoginUserUseCase:
         )
 
         # Create refresh token session in database
-        expiry = datetime.now(timezone.utc) + timedelta(
+        expiry = datetime.now(UTC) + timedelta(
             days=self._settings.REFRESH_TOKEN_EXPIRE_DAYS
         )
         session = Session(

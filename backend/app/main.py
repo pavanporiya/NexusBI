@@ -16,8 +16,8 @@ Architecture Reference:
 
 from __future__ import annotations
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI
 
@@ -33,7 +33,7 @@ from app.core.middleware import setup_middleware
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     """Manage the application startup and shutdown lifecycle.
 
     Startup:
@@ -110,11 +110,22 @@ def create_app() -> FastAPI:
     # 4. Create FastAPI application
     app = FastAPI(
         title=settings.PROJECT_NAME,
-        description="Enterprise Analytics Copilot — AI-powered business intelligence platform",
+        description=(
+            "Enterprise Analytics Copilot — AI-powered "
+            "business intelligence platform"
+        ),
         version=settings.VERSION,
         openapi_url=f"{settings.API_V1_STR}/openapi.json",
-        docs_url=f"{settings.API_V1_STR}/docs" if settings.is_development else None,
-        redoc_url=f"{settings.API_V1_STR}/redoc" if settings.is_development else None,
+        docs_url=(
+            f"{settings.API_V1_STR}/docs"
+            if settings.is_development
+            else None
+        ),
+        redoc_url=(
+            f"{settings.API_V1_STR}/redoc"
+            if settings.is_development
+            else None
+        ),
         lifespan=lifespan,
     )
 
