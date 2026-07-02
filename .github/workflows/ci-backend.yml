@@ -15,6 +15,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,21 +35,24 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/uv
-          key: ${{ runner.os }}-uv-${{ hashFiles('backend/pyproject.toml') }}
+          key: ${{ runner.os }}-uv-${{ hashFiles('backend/pyproject.toml', 'backend/uv.lock') }}
           restore-keys: |
             ${{ runner.os }}-uv-
 
+      - name: Install dependencies
+        run: uv sync
+
       - name: Run Ruff Linter
-        run: uv run --project backend ruff check .
+        run: uv run ruff check .
 
       - name: Run Ruff Formatter check
-        run: uv run --project backend ruff format --check .
+        run: uv run ruff format --check .
 
       - name: Run MyPy Type Checks
-        run: uv run --project backend mypy .
+        run: uv run mypy .
 
       - name: Run Backend Tests
-        run: uv run --project backend pytest
+        run: uv run pytest
         env:
           ENV: testing
           DEBUG: true
