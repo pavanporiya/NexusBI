@@ -1,1 +1,0 @@
-@tailwind base;@tailwind components;@tailwind utilities;:root{--background:#09090b;--foreground:#fafafa;--border:#27272a;--card:#18181b;--primary:#ffffff;--primary-foreground:#09090b;--muted:#27272a;--muted-foreground:#a1a1aa}body{background-color:var(--background);color:var(--foreground);font-family:Outfit,sans-serif;margin:0;padding:0}
