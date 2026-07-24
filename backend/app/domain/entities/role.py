@@ -116,7 +116,4 @@ class Role:
 
     def __repr__(self) -> str:
         perm_count = len(self.permissions)
-        return (
-            f"Role(id={self.id!r}, name={self.name!r}, "
-            f"permissions={perm_count})"
-        )
+        return f"Role(id={self.id!r}, name={self.name!r}, permissions={perm_count})"
