@@ -13,6 +13,8 @@ import pytest
 from app.domain.entities.permission import Permission
 from app.domain.entities.role import Role
 from app.domain.entities.user import User
+from app.domain.exceptions import InvalidEmailError, UserValidationError
+from app.domain.value_objects.email import Email
 
 # ── Fixtures ──────────────────────────────────────────────────────────
 
@@ -31,7 +33,7 @@ def _role(
 
 def _user(
     id: str = "u1",
-    email: str = "test@example.com",
+    email: Email | str = "test@example.com",
     full_name: str | None = None,
     hashed_password: str | None = None,
     is_active: bool = True,
@@ -68,6 +70,8 @@ class TestUserConstruction:
         user = _user()
         assert user.id == "u1"
         assert user.email == "test@example.com"
+        assert isinstance(user.email, Email)
+        assert user.email.value == "test@example.com"
         assert user.full_name is None
         assert user.hashed_password is None
         assert user.is_active is True
@@ -104,12 +108,16 @@ class TestUserInvariantValidation:
     """Tests for domain invariant enforcement."""
 
     def test_empty_email_raises_value_error(self) -> None:
-        with pytest.raises(ValueError, match="email must not be empty"):
+        with pytest.raises(InvalidEmailError, match="email must not be empty"):
             User(id="u1", email="")
 
     def test_whitespace_only_email_raises_value_error(self) -> None:
-        with pytest.raises(ValueError, match="email must not be empty"):
+        with pytest.raises(InvalidEmailError, match="email must not be empty"):
             User(id="u1", email="   ")
+
+    def test_invalid_email_format_raises_invalid_email_error(self) -> None:
+        with pytest.raises(InvalidEmailError, match="Invalid email address format"):
+            User(id="u1", email="not-an-email")
 
 
 # ── Lifecycle Methods ─────────────────────────────────────────────────
@@ -190,12 +198,16 @@ class TestUserChangePassword:
 
     def test_change_password_empty_raises_error(self) -> None:
         user = _user()
-        with pytest.raises(ValueError, match="Password hash must not be empty"):
+        with pytest.raises(
+            UserValidationError, match="Password hash must not be empty"
+        ):
             user.change_password("")
 
     def test_change_password_whitespace_raises_error(self) -> None:
         user = _user()
-        with pytest.raises(ValueError, match="Password hash must not be empty"):
+        with pytest.raises(
+            UserValidationError, match="Password hash must not be empty"
+        ):
             user.change_password("   ")
 
     def test_change_password_updates_timestamp(self) -> None:

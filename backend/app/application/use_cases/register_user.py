@@ -50,7 +50,7 @@ class RegisterUserUseCase:
 
         return UserDTO(
             id=saved_user.id,
-            email=saved_user.email,
+            email=str(saved_user.email),
             is_active=saved_user.is_active,
             roles=saved_user.role_names,
             permissions=saved_user.permission_names,

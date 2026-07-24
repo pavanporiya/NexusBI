@@ -16,6 +16,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from app.domain.entities.permission import Permission
+from app.domain.exceptions import InvalidRoleError
 
 
 @dataclass(slots=True)
@@ -46,7 +47,7 @@ class Role:
     def __post_init__(self) -> None:
         """Validate domain invariants on construction."""
         if not self.name or not self.name.strip():
-            raise ValueError("Role name must not be empty")
+            raise InvalidRoleError("Role name must not be empty")
 
     # ------------------------------------------------------------------
     # Permission management

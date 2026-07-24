@@ -6,7 +6,7 @@ whose methods enforce business invariants directly.
 
 Business Rules
 --------------
-* ``email`` must be non-empty.
+* ``email`` must be non-empty and valid (enforced via Email Value Object).
 * ``password_hash`` must be non-empty for password-based auth changes.
 * A user can only be verified once (idempotent).
 * Activate / deactivate are idempotent operations.
@@ -20,6 +20,8 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
 from app.domain.entities.role import Role
+from app.domain.exceptions import InvalidEmailError, UserValidationError
+from app.domain.value_objects.email import Email
 
 
 @dataclass(slots=True)
@@ -30,8 +32,9 @@ class User:
     ----------
     id : str
         UUID primary key.
-    email : str
-        Unique email address used for login.
+    email : Email | str
+        Unique email address used for login. Converted to Email
+        Value Object in __post_init__.
     full_name : str | None
         Optional display name for the user.
     hashed_password : str | None
@@ -51,7 +54,7 @@ class User:
     """
 
     id: str
-    email: str
+    email: Email | str
     full_name: str | None = None
     hashed_password: str | None = None
     is_active: bool = True
@@ -66,9 +69,11 @@ class User:
     # ------------------------------------------------------------------
 
     def __post_init__(self) -> None:
-        """Validate domain invariants on construction."""
-        if not self.email or not self.email.strip():
-            raise ValueError("User email must not be empty")
+        """Validate domain invariants and normalize email Value Object."""
+        if isinstance(self.email, str):
+            self.email = Email(self.email)
+        elif not isinstance(self.email, Email):
+            raise InvalidEmailError("User email must be a string or Email value object")
 
     # ------------------------------------------------------------------
     # Lifecycle mutations
@@ -115,11 +120,11 @@ class User:
 
         Raises
         ------
-        ValueError
+        UserValidationError
             If *new_password_hash* is empty.
         """
         if not new_password_hash or not new_password_hash.strip():
-            raise ValueError("Password hash must not be empty")
+            raise UserValidationError("Password hash must not be empty")
         self.hashed_password = new_password_hash
         self._touch()
 

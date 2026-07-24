@@ -10,6 +10,7 @@ import pytest
 
 from app.domain.entities.permission import Permission
 from app.domain.entities.role import Role
+from app.domain.exceptions import InvalidRoleError
 
 # ── Fixtures ──────────────────────────────────────────────────────────
 
@@ -52,11 +53,11 @@ class TestRoleInvariantValidation:
     """Tests for domain invariant enforcement."""
 
     def test_empty_name_raises_value_error(self) -> None:
-        with pytest.raises(ValueError, match="name must not be empty"):
+        with pytest.raises(InvalidRoleError, match="name must not be empty"):
             Role(id="r1", name="")
 
     def test_whitespace_only_name_raises_value_error(self) -> None:
-        with pytest.raises(ValueError, match="name must not be empty"):
+        with pytest.raises(InvalidRoleError, match="name must not be empty"):
             Role(id="r1", name="   ")
 
 
