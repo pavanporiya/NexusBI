@@ -9,3 +9,19 @@ Architecture Reference:
 - ADR-005: Clean Architecture
 - ADR-011: Repository Pattern
 """
+
+from app.infrastructure.database.base import Base
+from app.infrastructure.mappers.session_mapper import SessionMapper
+from app.infrastructure.mappers.user_mapper import UserMapper
+from app.infrastructure.repositories.session_repository import (
+    SQLAlchemySessionRepository,
+)
+from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
+
+__all__ = [
+    "Base",
+    "SQLAlchemySessionRepository",
+    "SQLAlchemyUserRepository",
+    "SessionMapper",
+    "UserMapper",
+]

@@ -19,19 +19,18 @@ from collections.abc import Generator
 
 from dependency_injector import containers, providers
 from sqlalchemy import Engine, create_engine
-from sqlalchemy.orm import Session, declarative_base, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import Settings, get_settings
 from app.core.logging import AuditLogger, get_logger
+from app.infrastructure.database.base import Base
 
 logger = get_logger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# SQLAlchemy Base Definition
-# ---------------------------------------------------------------------------
-
-Base = declarative_base()
+# Re-export Base so existing consumers of ``app.core.dependencies.Base``
+# continue to work without import changes.
+__all__ = ["Base", "Container", "get_db"]
 
 # ---------------------------------------------------------------------------
 # Database Session Factory
