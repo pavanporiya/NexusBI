@@ -4,9 +4,11 @@ Defines ports for token generation, password hashing, and OAuth flows.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from typing import Any
 
 from app.application.dto.auth_dto import GoogleUserDTO
+from app.domain.entities.user import User
 
 
 class IPasswordHasher(ABC):
@@ -47,3 +49,45 @@ class IGoogleOAuthService(ABC):
     @abstractmethod
     def verify_auth_code(self, code: str, redirect_uri: str) -> GoogleUserDTO:
         """Exchange authorization code for user profile info from Google OIDC."""
+
+
+class IAuthorizationService(ABC):
+    """Port interface for RBAC permission and role evaluation service."""
+
+    @abstractmethod
+    def has_permission(self, user: User, permission: str) -> bool:
+        """Check if an active user possesses the specified permission."""
+
+    @abstractmethod
+    def has_any_permission(self, user: User, permissions: Sequence[str]) -> bool:
+        """Check if an active user possesses at least one of the specified
+        permissions.
+        """
+
+    @abstractmethod
+    def has_all_permissions(self, user: User, permissions: Sequence[str]) -> bool:
+        """Check if an active user possesses all of the specified permissions."""
+
+    @abstractmethod
+    def has_role(self, user: User, role_name: str) -> bool:
+        """Check if an active user holds the specified role by name."""
+
+    @abstractmethod
+    def has_any_role(self, user: User, role_names: Sequence[str]) -> bool:
+        """Check if an active user holds at least one of the specified roles."""
+
+    @abstractmethod
+    def has_all_roles(self, user: User, role_names: Sequence[str]) -> bool:
+        """Check if an active user holds all of the specified roles."""
+
+    @abstractmethod
+    def can_access(self, user: User, resource: str, action: str) -> bool:
+        """Check if an active user is authorized to perform action on resource."""
+
+    @abstractmethod
+    def get_user_permissions(self, user: User) -> set[str]:
+        """Collect all qualified permission names assigned to an active user."""
+
+    @abstractmethod
+    def get_user_roles(self, user: User) -> set[str]:
+        """Collect all role names assigned to an active user."""
