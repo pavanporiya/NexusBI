@@ -13,7 +13,7 @@ from datetime import UTC, datetime, timedelta
 
 from app.domain.entities.session import Session
 from app.domain.entities.user import User
-from app.domain.interfaces.i_session_repository import (
+from app.domain.repositories.session_repository import (
     ISessionRepository as ISessionRepo,
 )
 from app.domain.repositories.user_repository import IUserRepository as IUserRepo
@@ -40,19 +40,28 @@ class _StubUserRepository:
         return True
 
 
-class _StubSessionRepository:
+class _StubSessionRepository(ISessionRepo):
     """Minimal conforming implementation of ISessionRepository."""
 
-    def create(self, session: Session) -> Session:
+    def get_by_id(self, _session_id: str) -> Session | None:
+        return None
+
+    def get_by_token_id(self, _token_id: str) -> Session | None:
+        return None
+
+    def get_by_refresh_token(self, _refresh_token: str) -> Session | None:
+        return None
+
+    def save(self, session: Session) -> Session:
         return session
 
-    def revoke(self, _session_id: str) -> bool:
+    def revoke_by_id(self, _session_id: str) -> bool:
         return True
 
-    def find_active(self, _user_id: str) -> list[Session]:
-        return []
+    def revoke_by_token_id(self, _token_id: str) -> bool:
+        return True
 
-    def delete_expired(self) -> int:
+    def revoke_all_user_sessions(self, _user_id: str) -> int:
         return 0
 
 
@@ -133,17 +142,29 @@ class TestISessionRepositoryProtocol:
             refresh_token="rt",
             expires_at=datetime.now(UTC) + timedelta(hours=1),
         )
-        result = repo.create(session)
+        result = repo.save(session)
         assert result is session
 
     def test_revoke_returns_bool(self) -> None:
         repo = _StubSessionRepository()
-        assert repo.revoke("s1") is True
+        assert repo.revoke_by_id("s1") is True
 
-    def test_find_active_returns_empty_list(self) -> None:
+    def test_get_by_id_returns_none(self) -> None:
         repo = _StubSessionRepository()
-        assert repo.find_active("u1") == []
+        assert repo.get_by_id("s1") is None
 
-    def test_delete_expired_returns_int(self) -> None:
+    def test_get_by_token_id_returns_none(self) -> None:
         repo = _StubSessionRepository()
-        assert repo.delete_expired() == 0
+        assert repo.get_by_token_id("tid") is None
+
+    def test_get_by_refresh_token_returns_none(self) -> None:
+        repo = _StubSessionRepository()
+        assert repo.get_by_refresh_token("refresh-token") is None
+
+    def test_revoke_by_token_id_returns_bool(self) -> None:
+        repo = _StubSessionRepository()
+        assert repo.revoke_by_token_id("tid") is True
+
+    def test_revoke_all_user_sessions_returns_int(self) -> None:
+        repo = _StubSessionRepository()
+        assert repo.revoke_all_user_sessions("u1") == 0
