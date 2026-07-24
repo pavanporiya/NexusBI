@@ -458,3 +458,139 @@ class TestSQLAlchemySessionRepositoryRevoke:
 
         result = repo.revoke_all_user_sessions("u-no-sessions")
         assert result == 0
+
+
+# ── RoleRepository Method Tests ──────────────────────────────────────
+
+
+class TestRoleRepositoryConformance:
+    """Verify SQLAlchemyRoleRepository satisfies IRoleRepository Protocol."""
+
+    def test_isinstance_check(self) -> None:
+        from app.domain.repositories.role_repository import IRoleRepository
+        from app.infrastructure.repositories.role_repository import (
+            SQLAlchemyRoleRepository,
+        )
+
+        repo = SQLAlchemyRoleRepository(session=_mock_db_session())
+        assert isinstance(repo, IRoleRepository)
+
+
+class TestSQLAlchemyRoleRepositoryMethods:
+    """Tests for SQLAlchemyRoleRepository operations."""
+
+    def test_get_all(self) -> None:
+        from app.domain.entities.role import Role
+        from app.infrastructure.database.models import RoleModel
+        from app.infrastructure.repositories.role_repository import (
+            SQLAlchemyRoleRepository,
+        )
+
+        db = _mock_db_session()
+        role_model = RoleModel(id="r1", name="Admin", description="Admin role")
+        role_model.permissions = []
+        db.execute.return_value.scalars.return_value.all.return_value = [role_model]
+
+        repo = SQLAlchemyRoleRepository(session=db)
+        results = repo.get_all()
+
+        assert len(results) == 1
+        assert isinstance(results[0], Role)
+        assert results[0].name == "Admin"
+
+    def test_get_by_id_found(self) -> None:
+        from app.domain.entities.role import Role
+        from app.infrastructure.database.models import RoleModel
+        from app.infrastructure.repositories.role_repository import (
+            SQLAlchemyRoleRepository,
+        )
+
+        db = _mock_db_session()
+        role_model = RoleModel(id="r1", name="Admin", description="Admin role")
+        role_model.permissions = []
+        db.execute.return_value.scalars.return_value.first.return_value = role_model
+
+        repo = SQLAlchemyRoleRepository(session=db)
+        result = repo.get_by_id("r1")
+
+        assert result is not None
+        assert isinstance(result, Role)
+        assert result.id == "r1"
+
+    def test_get_by_name_found(self) -> None:
+        from app.domain.entities.role import Role
+        from app.infrastructure.database.models import RoleModel
+        from app.infrastructure.repositories.role_repository import (
+            SQLAlchemyRoleRepository,
+        )
+
+        db = _mock_db_session()
+        role_model = RoleModel(id="r1", name="Admin", description="Admin role")
+        role_model.permissions = []
+        db.execute.return_value.scalars.return_value.first.return_value = role_model
+
+        repo = SQLAlchemyRoleRepository(session=db)
+        result = repo.get_by_name("admin")
+
+        assert result is not None
+        assert isinstance(result, Role)
+        assert result.name == "Admin"
+
+    def test_get_permissions_by_ids(self) -> None:
+        from app.domain.entities.permission import Permission
+        from app.infrastructure.database.models import PermissionModel
+        from app.infrastructure.repositories.role_repository import (
+            SQLAlchemyRoleRepository,
+        )
+
+        db = _mock_db_session()
+        perm_model = PermissionModel(
+            id="p1", resource="roles", action="read", description="Read"
+        )
+        db.execute.return_value.scalars.return_value.all.return_value = [perm_model]
+
+        repo = SQLAlchemyRoleRepository(session=db)
+        results = repo.get_permissions_by_ids(["p1", "roles:read"])
+
+        assert len(results) == 1
+        assert isinstance(results[0], Permission)
+        assert results[0].id == "p1"
+
+    def test_save_new_role(self) -> None:
+        from app.domain.entities.role import Role
+        from app.infrastructure.database.models import RoleModel
+        from app.infrastructure.repositories.role_repository import (
+            SQLAlchemyRoleRepository,
+        )
+
+        db = _mock_db_session()
+        db.execute.return_value.scalars.return_value.first.return_value = None
+
+        def _refresh_side_effect(model: RoleModel) -> None:
+            if not hasattr(model, "permissions") or model.permissions is None:
+                model.permissions = []
+
+        db.refresh.side_effect = _refresh_side_effect
+
+        repo = SQLAlchemyRoleRepository(session=db)
+        role = Role(id="r-new", name="NewRole")
+        saved = repo.save(role)
+
+        assert isinstance(saved, Role)
+        db.add.assert_called_once()
+        db.flush.assert_called_once()
+
+    def test_delete_role(self) -> None:
+        from app.infrastructure.database.models import RoleModel
+        from app.infrastructure.repositories.role_repository import (
+            SQLAlchemyRoleRepository,
+        )
+
+        db = _mock_db_session()
+        role_model = RoleModel(id="r1", name="CustomRole")
+        db.get.return_value = role_model
+
+        repo = SQLAlchemyRoleRepository(session=db)
+        assert repo.delete("r1") is True
+        db.delete.assert_called_once_with(role_model)
+        db.flush.assert_called_once()

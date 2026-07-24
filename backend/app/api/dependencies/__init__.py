@@ -7,6 +7,7 @@ from app.api.dependencies.auth import (
     get_authorization_service,
     get_current_user,
     get_current_user_use_case,
+    get_get_user_use_case,
     get_login_user_use_case,
     get_logout_user_use_case,
     get_password_hasher,
@@ -14,6 +15,7 @@ from app.api.dependencies.auth import (
     get_register_user_use_case,
     get_session_repository,
     get_token_service,
+    get_update_user_use_case,
     get_user_repository,
 )
 from app.api.dependencies.authorization import (
@@ -32,6 +34,7 @@ __all__ = [
     "get_authorization_service",
     "get_current_user",
     "get_current_user_use_case",
+    "get_get_user_use_case",
     "get_login_user_use_case",
     "get_logout_user_use_case",
     "get_password_hasher",
@@ -39,6 +42,7 @@ __all__ = [
     "get_register_user_use_case",
     "get_session_repository",
     "get_token_service",
+    "get_update_user_use_case",
     "get_user_repository",
     "require_all_permissions",
     "require_any_permission",

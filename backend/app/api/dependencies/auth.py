@@ -18,18 +18,29 @@ from app.application.services.interfaces import (
     ITokenService,
 )
 from app.application.use_cases import (
+    CreateRoleUseCase,
+    DeleteRoleUseCase,
     GetCurrentUserUseCase,
+    GetRoleByIdUseCase,
+    GetRolesUseCase,
+    GetUserUseCase,
     LoginUserUseCase,
     LogoutUserUseCase,
     RefreshTokenUseCase,
     RegisterUserUseCase,
+    UpdateRoleUseCase,
+    UpdateUserUseCase,
 )
 from app.core.config import get_settings
 from app.core.dependencies import get_db
 from app.core.exceptions import AuthenticationError
 from app.domain.entities.user import User
+from app.domain.repositories.role_repository import IRoleRepository
 from app.domain.repositories.session_repository import ISessionRepository
 from app.domain.repositories.user_repository import IUserRepository
+from app.infrastructure.repositories.role_repository import (
+    SQLAlchemyRoleRepository,
+)
 from app.infrastructure.repositories.session_repository import (
     SQLAlchemySessionRepository,
 )
@@ -70,6 +81,13 @@ def get_session_repository(
 ) -> ISessionRepository:
     """Dependency provider for ISessionRepository."""
     return SQLAlchemySessionRepository(db)
+
+
+def get_role_repository(
+    db: Annotated[Session, Depends(get_db)],
+) -> IRoleRepository:
+    """Dependency provider for IRoleRepository."""
+    return SQLAlchemyRoleRepository(db)
 
 
 def get_authorization_service() -> IAuthorizationService:
@@ -136,6 +154,55 @@ def get_current_user_use_case(
         user_repository=user_repo,
         token_service=token_service,
     )
+
+
+def get_get_user_use_case(
+    user_repo: Annotated[IUserRepository, Depends(get_user_repository)],
+) -> GetUserUseCase:
+    """Dependency provider for GetUserUseCase."""
+    return GetUserUseCase(user_repository=user_repo)
+
+
+def get_update_user_use_case(
+    user_repo: Annotated[IUserRepository, Depends(get_user_repository)],
+) -> UpdateUserUseCase:
+    """Dependency provider for UpdateUserUseCase."""
+    return UpdateUserUseCase(user_repository=user_repo)
+
+
+def get_get_roles_use_case(
+    role_repo: Annotated[IRoleRepository, Depends(get_role_repository)],
+) -> GetRolesUseCase:
+    """Dependency provider for GetRolesUseCase."""
+    return GetRolesUseCase(role_repository=role_repo)
+
+
+def get_get_role_by_id_use_case(
+    role_repo: Annotated[IRoleRepository, Depends(get_role_repository)],
+) -> GetRoleByIdUseCase:
+    """Dependency provider for GetRoleByIdUseCase."""
+    return GetRoleByIdUseCase(role_repository=role_repo)
+
+
+def get_create_role_use_case(
+    role_repo: Annotated[IRoleRepository, Depends(get_role_repository)],
+) -> CreateRoleUseCase:
+    """Dependency provider for CreateRoleUseCase."""
+    return CreateRoleUseCase(role_repository=role_repo)
+
+
+def get_update_role_use_case(
+    role_repo: Annotated[IRoleRepository, Depends(get_role_repository)],
+) -> UpdateRoleUseCase:
+    """Dependency provider for UpdateRoleUseCase."""
+    return UpdateRoleUseCase(role_repository=role_repo)
+
+
+def get_delete_role_use_case(
+    role_repo: Annotated[IRoleRepository, Depends(get_role_repository)],
+) -> DeleteRoleUseCase:
+    """Dependency provider for DeleteRoleUseCase."""
+    return DeleteRoleUseCase(role_repository=role_repo)
 
 
 def get_current_user(

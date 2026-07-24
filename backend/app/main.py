@@ -146,6 +146,8 @@ def _register_routers(app: FastAPI, api_prefix: str) -> None:
     """
     from app.api.health import router as health_router
     from app.api.v1.routers.auth import router as auth_router
+    from app.api.v1.routers.roles import router as roles_router
+    from app.api.v1.routers.users import router as users_router
 
     # Health endpoints are mounted at the root and under the API prefix
     app.include_router(
@@ -165,6 +167,18 @@ def _register_routers(app: FastAPI, api_prefix: str) -> None:
     # Mount Authentication REST API endpoints
     app.include_router(
         auth_router,
+        prefix=api_prefix,
+    )
+
+    # Mount User Management REST API endpoints
+    app.include_router(
+        users_router,
+        prefix=api_prefix,
+    )
+
+    # Mount Role Management REST API endpoints
+    app.include_router(
+        roles_router,
         prefix=api_prefix,
     )
 
