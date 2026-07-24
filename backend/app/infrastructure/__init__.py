@@ -17,9 +17,13 @@ from app.infrastructure.repositories.session_repository import (
     SQLAlchemySessionRepository,
 )
 from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
+from app.infrastructure.services.bcrypt_password_hasher import BcryptPasswordHasher
+from app.infrastructure.services.jwt_token_service import JWTTokenService
 
 __all__ = [
     "Base",
+    "BcryptPasswordHasher",
+    "JWTTokenService",
     "SQLAlchemySessionRepository",
     "SQLAlchemyUserRepository",
     "SessionMapper",
