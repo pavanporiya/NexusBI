@@ -9,6 +9,7 @@ Provides shared pytest fixtures for the backend test suite:
 
 from __future__ import annotations
 
+import os
 from collections.abc import Generator
 from unittest.mock import MagicMock
 
@@ -16,14 +17,16 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+# Ensure settings import does not inherit invalid shell DEBUG values.
+os.environ.setdefault("ENV", "testing")
+os.environ["DEBUG"] = "true"
+
 from app.core.config import Settings
 
 
 @pytest.fixture(scope="session")
 def test_settings() -> Generator[Settings]:
     """Provide test-specific settings overrides."""
-    import os
-
     os.environ["ENV"] = "testing"
     os.environ["DEBUG"] = "true"
     os.environ["PROJECT_NAME"] = "NexusBI Backend"

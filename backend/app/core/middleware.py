@@ -19,10 +19,12 @@ import structlog
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.config import settings
 from app.core.logging import (
+    get_correlation_id,
     get_logger,
     reset_correlation_id,
     set_correlation_id,
@@ -113,26 +115,31 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         start_time = time.perf_counter()
+        request_id = getattr(request.state, "request_id", None) or get_correlation_id()
 
         logger.info(
             "Request started",
+            request_id=request_id,
             method=request.method,
             path=path,
-            query_params=str(request.query_params) if request.query_params else None,
             client_ip=self._get_client_ip(request),
             user_agent=request.headers.get("user-agent"),
         )
 
         try:
             response = await call_next(request)
-            duration_ms = (time.perf_counter() - start_time) * 1000
+            duration_s = time.perf_counter() - start_time
+            duration_ms = duration_s * 1000
 
             log_method = logger.info if response.status_code < 400 else logger.warning
             log_method(
                 "Request completed",
+                request_id=request_id,
                 method=request.method,
                 path=path,
+                status=response.status_code,
                 status_code=response.status_code,
+                duration=round(duration_s, 6),
                 duration_ms=round(duration_ms, 2),
             )
 
@@ -142,13 +149,19 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             return response
 
         except Exception as exc:
-            duration_ms = (time.perf_counter() - start_time) * 1000
+            duration_s = time.perf_counter() - start_time
+            duration_ms = duration_s * 1000
             logger.error(
                 "Request failed with exception",
+                request_id=request_id,
                 method=request.method,
                 path=path,
+                status=500,
+                status_code=500,
+                duration=round(duration_s, 6),
                 duration_ms=round(duration_ms, 2),
                 exception_type=type(exc).__name__,
+                message=str(exc),
                 error=str(exc),
             )
             raise
@@ -183,6 +196,11 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; frame-ancestors 'none'; object-src 'none';"
+        )
+        response.headers["X-Permitted-Cross-Domain-Policies"] = "none"
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
         response.headers["Permissions-Policy"] = (
             "accelerometer=(), camera=(), geolocation=(), "
             "gyroscope=(), magnetometer=(), microphone=(), "
@@ -244,8 +262,15 @@ def setup_middleware(app: FastAPI) -> None:
     4. SecurityHeadersMiddleware → Injects security headers
     5. GZipMiddleware           → Compresses response body
     6. CORSMiddleware           → Applies CORS policy
+    7. TrustedHostMiddleware    → Validates HTTP Host header
     """
-    # 6. CORS (outermost in the response chain)
+    # 7. Trusted Host Header validation (outermost in the response chain)
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=settings.ALLOWED_HOSTS,
+    )
+
+    # 6. CORS
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.ALLOWED_ORIGINS,

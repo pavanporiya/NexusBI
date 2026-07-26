@@ -57,7 +57,8 @@ def add_correlation_id(
     """Inject the current correlation ID into every log entry."""
     cid = correlation_id_ctx.get("")
     if cid:
-        event_dict["correlation_id"] = cid
+        event_dict.setdefault("correlation_id", cid)
+        event_dict.setdefault("request_id", cid)
     return event_dict
 
 
@@ -82,10 +83,31 @@ def censor_sensitive_data(
         "secret_key",
         "access_token",
         "refresh_token",
+        "auth",
+        "credentials",
+        "bearer",
     }
+
+    def _redact_value(val: Any) -> Any:
+        if isinstance(val, dict):
+            return {
+                k: (
+                    "***REDACTED***"
+                    if isinstance(k, str)
+                    and any(s in k.lower() for s in sensitive_keys)
+                    else _redact_value(v)
+                )
+                for k, v in val.items()
+            }
+        if isinstance(val, list):
+            return [_redact_value(item) for item in val]
+        return val
+
     for key in list(event_dict.keys()):
         if any(s in key.lower() for s in sensitive_keys):
             event_dict[key] = "***REDACTED***"
+        else:
+            event_dict[key] = _redact_value(event_dict[key])
     return event_dict
 
 

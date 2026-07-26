@@ -18,12 +18,15 @@ Tables
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     Column,
     DateTime,
     ForeignKey,
+    Integer,
     String,
     Table,
     Text,
@@ -225,4 +228,337 @@ class SessionModel(Base):
         return (
             f"SessionModel(id={self.id!r}, user_id={self.user_id!r}, "
             f"is_revoked={self.is_revoked!r})"
+        )
+
+
+class DashboardModel(Base):
+    """ORM model for the ``dashboards`` table.
+
+    Represents a BI dashboard containing widget layout configurations.
+    """
+
+    __tablename__ = "dashboards"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    name: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
+    owner_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    dataset_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("datasets.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    workspace_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("workspaces.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    layout_json: Mapped[dict[str, Any]] = mapped_column(
+        "layout_json", JSON, nullable=False, default=dict
+    )
+    is_public: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    is_active: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, index=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+
+    owner: Mapped[UserModel] = relationship("UserModel")
+    dataset: Mapped[DatasetModel] = relationship("DatasetModel")
+
+    @property
+    def layout_config(self) -> dict[str, Any]:
+        """Backward compatibility alias for layout_json."""
+        return self.layout_json
+
+    @layout_config.setter
+    def layout_config(self, value: dict[str, Any]) -> None:
+        """Backward compatibility setter for layout_json."""
+        self.layout_json = value
+
+    def __repr__(self) -> str:
+        return f"DashboardModel(id={self.id!r}, name={self.name!r})"
+
+
+class DatasetModel(Base):
+    """ORM model for the ``datasets`` table.
+
+    Represents a data source definition, query, or physical table reference.
+    """
+
+    __tablename__ = "datasets"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    name: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
+    source_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    query_or_table: Mapped[str] = mapped_column(Text, nullable=False)
+    object_type: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    object_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    sql_query: Mapped[str | None] = mapped_column(Text, nullable=True)
+    connection_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    owner_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    workspace_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("workspaces.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    schema_metadata: Mapped[dict[str, Any]] = mapped_column(
+        JSON, nullable=False, default=dict
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+
+    owner: Mapped[UserModel] = relationship("UserModel")
+
+    def __repr__(self) -> str:
+        return f"DatasetModel(id={self.id!r}, name={self.name!r})"
+
+
+class ReportModel(Base):
+    """ORM model for the ``reports`` table.
+
+    Represents an analytical report aggregate configuration.
+    """
+
+    __tablename__ = "reports"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    name: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
+    dataset_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("datasets.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    owner_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    workspace_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("workspaces.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    report_type: Mapped[str] = mapped_column(
+        String(64), nullable=False, default="tabular", index=True
+    )
+    output_format: Mapped[str] = mapped_column(
+        String(64), nullable=False, default="json"
+    )
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    schedule: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    is_active: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, index=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+    query: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    visualization_type: Mapped[str] = mapped_column(
+        String(64), nullable=False, default="table"
+    )
+    config: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+
+    owner: Mapped[UserModel] = relationship("UserModel")
+    dataset: Mapped[DatasetModel] = relationship("DatasetModel")
+
+    def __repr__(self) -> str:
+        return f"ReportModel(id={self.id!r}, name={self.name!r})"
+
+
+class OrganizationModel(Base):
+    """ORM model for the ``organizations`` table."""
+
+    __tablename__ = "organizations"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    name: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
+    slug: Mapped[str] = mapped_column(
+        String(256), nullable=False, unique=True, index=True
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+
+    workspaces: Mapped[list[WorkspaceModel]] = relationship(
+        "WorkspaceModel",
+        back_populates="organization",
+        cascade="all, delete-orphan",
+    )
+
+    def __repr__(self) -> str:
+        return f"OrganizationModel(id={self.id!r}, slug={self.slug!r})"
+
+
+class WorkspaceModel(Base):
+    """ORM model for the ``workspaces`` table."""
+
+    __tablename__ = "workspaces"
+    __table_args__ = (
+        UniqueConstraint(
+            "organization_id", "slug", name="uq_workspaces_organization_slug"
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    organization_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    name: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
+    slug: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+
+    organization: Mapped[OrganizationModel] = relationship(
+        "OrganizationModel",
+        back_populates="workspaces",
+    )
+    memberships: Mapped[list[MembershipModel]] = relationship(
+        "MembershipModel",
+        back_populates="workspace",
+        cascade="all, delete-orphan",
+    )
+
+    def __repr__(self) -> str:
+        return f"WorkspaceModel(id={self.id!r}, slug={self.slug!r})"
+
+
+class MembershipModel(Base):
+    """ORM model for the ``memberships`` table."""
+
+    __tablename__ = "memberships"
+    __table_args__ = (
+        UniqueConstraint(
+            "workspace_id", "user_id", name="uq_memberships_workspace_user"
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    workspace_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("workspaces.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    user_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    role_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("roles.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    joined_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+
+    workspace: Mapped[WorkspaceModel] = relationship(
+        "WorkspaceModel",
+        back_populates="memberships",
+    )
+    user: Mapped[UserModel] = relationship("UserModel")
+    role: Mapped[RoleModel] = relationship("RoleModel")
+
+    def __repr__(self) -> str:
+        return (
+            f"MembershipModel(id={self.id!r}, workspace_id={self.workspace_id!r}, "
+            f"user_id={self.user_id!r})"
+        )
+
+
+class WidgetModel(Base):
+    """ORM model for the ``widgets`` table.
+
+    Represents a dashboard widget visualization bound to a dataset.
+    """
+
+    __tablename__ = "widgets"
+    __table_args__ = (
+        UniqueConstraint("dashboard_id", "title", name="uq_widgets_dashboard_title"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    dashboard_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("dashboards.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    dataset_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("datasets.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    title: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
+    widget_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    row: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    column: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    width: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    height: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    configuration: Mapped[dict[str, Any]] = mapped_column(
+        JSON, nullable=False, default=dict
+    )
+    refresh_interval: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    is_visible: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+
+    dashboard: Mapped[DashboardModel] = relationship("DashboardModel")
+    dataset: Mapped[DatasetModel] = relationship("DatasetModel")
+
+    def __repr__(self) -> str:
+        return (
+            f"WidgetModel(id={self.id!r}, title={self.title!r}, "
+            f"dashboard_id={self.dashboard_id!r})"
         )

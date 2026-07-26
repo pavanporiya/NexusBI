@@ -139,6 +139,32 @@ PERM_REPORTS_EXPORT = Permission(
     description="Export report datasets to external formats",
 )
 
+# Datasets
+PERM_DATASETS_CREATE = Permission(
+    id="perm-datasets-create",
+    resource="datasets",
+    action="create",
+    description="Create new datasets",
+)
+PERM_DATASETS_READ = Permission(
+    id="perm-datasets-read",
+    resource="datasets",
+    action="read",
+    description="Read and query datasets",
+)
+PERM_DATASETS_UPDATE = Permission(
+    id="perm-datasets-update",
+    resource="datasets",
+    action="update",
+    description="Update dataset configurations and metadata",
+)
+PERM_DATASETS_DELETE = Permission(
+    id="perm-datasets-delete",
+    resource="datasets",
+    action="delete",
+    description="Delete datasets",
+)
+
 # Settings
 PERM_SETTINGS_READ = Permission(
     id="perm-settings-read",
@@ -151,6 +177,84 @@ PERM_SETTINGS_UPDATE = Permission(
     resource="settings",
     action="update",
     description="Update system configuration settings",
+)
+
+# Organizations
+PERM_ORGANIZATIONS_CREATE = Permission(
+    id="perm-organizations-create",
+    resource="organizations",
+    action="create",
+    description="Create new enterprise organizations",
+)
+PERM_ORGANIZATIONS_READ = Permission(
+    id="perm-organizations-read",
+    resource="organizations",
+    action="read",
+    description="Read organization details and listings",
+)
+PERM_ORGANIZATIONS_UPDATE = Permission(
+    id="perm-organizations-update",
+    resource="organizations",
+    action="update",
+    description="Update organization configurations",
+)
+PERM_ORGANIZATIONS_DELETE = Permission(
+    id="perm-organizations-delete",
+    resource="organizations",
+    action="delete",
+    description="Delete enterprise organizations",
+)
+
+# Workspaces
+PERM_WORKSPACES_CREATE = Permission(
+    id="perm-workspaces-create",
+    resource="workspaces",
+    action="create",
+    description="Create new workspaces",
+)
+PERM_WORKSPACES_READ = Permission(
+    id="perm-workspaces-read",
+    resource="workspaces",
+    action="read",
+    description="Read workspace details and listings",
+)
+PERM_WORKSPACES_UPDATE = Permission(
+    id="perm-workspaces-update",
+    resource="workspaces",
+    action="update",
+    description="Update workspace details",
+)
+PERM_WORKSPACES_DELETE = Permission(
+    id="perm-workspaces-delete",
+    resource="workspaces",
+    action="delete",
+    description="Delete workspaces",
+)
+
+# Memberships
+PERM_MEMBERSHIPS_CREATE = Permission(
+    id="perm-memberships-create",
+    resource="memberships",
+    action="create",
+    description="Add members to workspaces",
+)
+PERM_MEMBERSHIPS_READ = Permission(
+    id="perm-memberships-read",
+    resource="memberships",
+    action="read",
+    description="Read workspace membership details",
+)
+PERM_MEMBERSHIPS_UPDATE = Permission(
+    id="perm-memberships-update",
+    resource="memberships",
+    action="update",
+    description="Update member roles within workspaces",
+)
+PERM_MEMBERSHIPS_DELETE = Permission(
+    id="perm-memberships-delete",
+    resource="memberships",
+    action="delete",
+    description="Remove members from workspaces",
 )
 
 DEFAULT_PERMISSIONS: tuple[Permission, ...] = (
@@ -173,8 +277,24 @@ DEFAULT_PERMISSIONS: tuple[Permission, ...] = (
     PERM_REPORTS_UPDATE,
     PERM_REPORTS_DELETE,
     PERM_REPORTS_EXPORT,
+    PERM_DATASETS_CREATE,
+    PERM_DATASETS_READ,
+    PERM_DATASETS_UPDATE,
+    PERM_DATASETS_DELETE,
     PERM_SETTINGS_READ,
     PERM_SETTINGS_UPDATE,
+    PERM_ORGANIZATIONS_CREATE,
+    PERM_ORGANIZATIONS_READ,
+    PERM_ORGANIZATIONS_UPDATE,
+    PERM_ORGANIZATIONS_DELETE,
+    PERM_WORKSPACES_CREATE,
+    PERM_WORKSPACES_READ,
+    PERM_WORKSPACES_UPDATE,
+    PERM_WORKSPACES_DELETE,
+    PERM_MEMBERSHIPS_CREATE,
+    PERM_MEMBERSHIPS_READ,
+    PERM_MEMBERSHIPS_UPDATE,
+    PERM_MEMBERSHIPS_DELETE,
 )
 
 # ----------------------------------------------------------------------
@@ -218,8 +338,24 @@ def _create_default_roles() -> tuple[Role, ...]:
             PERM_REPORTS_UPDATE,
             PERM_REPORTS_DELETE,
             PERM_REPORTS_EXPORT,
+            PERM_DATASETS_CREATE,
+            PERM_DATASETS_READ,
+            PERM_DATASETS_UPDATE,
+            PERM_DATASETS_DELETE,
             PERM_SETTINGS_READ,
             PERM_SETTINGS_UPDATE,
+            PERM_ORGANIZATIONS_CREATE,
+            PERM_ORGANIZATIONS_READ,
+            PERM_ORGANIZATIONS_UPDATE,
+            PERM_ORGANIZATIONS_DELETE,
+            PERM_WORKSPACES_CREATE,
+            PERM_WORKSPACES_READ,
+            PERM_WORKSPACES_UPDATE,
+            PERM_WORKSPACES_DELETE,
+            PERM_MEMBERSHIPS_CREATE,
+            PERM_MEMBERSHIPS_READ,
+            PERM_MEMBERSHIPS_UPDATE,
+            PERM_MEMBERSHIPS_DELETE,
         ],
     )
 
@@ -239,6 +375,9 @@ def _create_default_roles() -> tuple[Role, ...]:
             PERM_REPORTS_READ,
             PERM_REPORTS_UPDATE,
             PERM_REPORTS_EXPORT,
+            PERM_DATASETS_CREATE,
+            PERM_DATASETS_READ,
+            PERM_DATASETS_UPDATE,
             PERM_SETTINGS_READ,
         ],
     )
@@ -258,6 +397,9 @@ def _create_default_roles() -> tuple[Role, ...]:
             PERM_REPORTS_READ,
             PERM_REPORTS_UPDATE,
             PERM_REPORTS_EXPORT,
+            PERM_DATASETS_CREATE,
+            PERM_DATASETS_READ,
+            PERM_DATASETS_UPDATE,
         ],
     )
 
@@ -270,6 +412,7 @@ def _create_default_roles() -> tuple[Role, ...]:
             PERM_DASHBOARD_VIEW,
             PERM_DASHBOARD_READ,
             PERM_REPORTS_READ,
+            PERM_DATASETS_READ,
         ],
     )
 

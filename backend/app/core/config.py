@@ -79,6 +79,7 @@ class Settings(BaseSettings):
     PORT: int = 8000
     WORKERS: int = 1
     RELOAD: bool = False
+    ALLOWED_HOSTS: list[str] = Field(default=["*"])
 
     # ── CORS ───────────────────────────────────────────────────────────
     ALLOWED_ORIGINS: list[str] = Field(
@@ -212,14 +213,34 @@ class Settings(BaseSettings):
             raise ValueError("ACCESS_TOKEN_EXPIRE_MINUTES must be >= 1")
         return val
 
+    @field_validator("ALLOWED_ORIGINS", "ALLOWED_HOSTS", mode="before")
+    @classmethod
+    def validate_string_list(cls, v: Any) -> list[str]:
+        """Convert comma-separated string to list of strings if necessary."""
+        if isinstance(v, str):
+            return [s.strip() for s in v.split(",") if s.strip()]
+        if isinstance(v, list):
+            return [str(item) for item in v]
+        return []
+
     @model_validator(mode="after")
     def validate_production_secrets(self) -> Settings:
-        """Enforce that production and staging environments have real secrets."""
+        """Enforce production/staging secret strength and origin rules."""
         if self.ENV in (Environment.PRODUCTION, Environment.STAGING):
             secret_value = self.SECRET_KEY.get_secret_value()
             if secret_value == "placeholder_secret_key_change_in_production":
                 raise ValueError(
                     "SECRET_KEY must be set to a secure value in "
+                    f"{self.ENV} environment"
+                )
+            if len(secret_value) < 32:
+                raise ValueError(
+                    "SECRET_KEY must be at least 32 characters long in "
+                    f"{self.ENV} environment"
+                )
+            if "*" in self.ALLOWED_ORIGINS:
+                raise ValueError(
+                    "ALLOWED_ORIGINS cannot contain wildcard '*' in "
                     f"{self.ENV} environment"
                 )
         return self
