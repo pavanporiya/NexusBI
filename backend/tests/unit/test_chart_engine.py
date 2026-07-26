@@ -43,11 +43,12 @@ def make_query_result(
     columns: list[QueryColumn] | None = None,
 ) -> QueryResult:
     """Build a reusable query result fixture."""
-    rows = rows or [
-        {"category": "Jan", "sales": 10, "profit": 2, "segment": "A"},
-        {"category": "Feb", "sales": 15, "profit": 4, "segment": "B"},
-        {"category": "Jan", "sales": 5, "profit": 1, "segment": "A"},
-    ]
+    if rows is None:
+        rows = [
+            {"category": "Jan", "sales": 10, "profit": 2, "segment": "A"},
+            {"category": "Feb", "sales": 15, "profit": 4, "segment": "B"},
+            {"category": "Jan", "sales": 5, "profit": 1, "segment": "A"},
+        ]
     columns = columns or [
         QueryColumn(name="category", type="string"),
         QueryColumn(name="sales", type="integer"),
@@ -85,7 +86,7 @@ def make_config(
     return ChartConfiguration(
         chart_type=chart_type,
         x_axis_column=x_axis_column,
-        y_axis_columns=y_axis_columns or ["sales"],
+        y_axis_columns=["sales"] if y_axis_columns is None else y_axis_columns,
         group_by_column=group_by_column,
         aggregation=aggregation,
         title=title,

@@ -24,11 +24,12 @@ def make_chart_request(
     config_overrides: dict[str, object] | None = None,
 ) -> dict[str, object]:
     """Build a reusable API payload."""
-    rows = rows or [
-        {"month": "Jan", "sales": 10, "profit": 2},
-        {"month": "Feb", "sales": 15, "profit": 4},
-        {"month": "Mar", "sales": 20, "profit": 6},
-    ]
+    if rows is None:
+        rows = [
+            {"month": "Jan", "sales": 10, "profit": 2},
+            {"month": "Feb", "sales": 15, "profit": 4},
+            {"month": "Mar", "sales": 20, "profit": 6},
+        ]
     columns = columns or [
         {"name": "month", "type": "string"},
         {"name": "sales", "type": "integer"},

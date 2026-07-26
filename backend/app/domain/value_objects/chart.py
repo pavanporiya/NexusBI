@@ -110,18 +110,24 @@ class ChartConfiguration:
 
     def __post_init__(self) -> None:
         """Normalize configuration parameters."""
-        chart_t = (
-            ChartType.from_str(self.chart_type)
-            if isinstance(self.chart_type, str)
-            else self.chart_type
-        )
+        try:
+            chart_t = (
+                ChartType.from_str(self.chart_type)
+                if isinstance(self.chart_type, str)
+                else self.chart_type
+            )
+        except ValueError as exc:
+            raise ChartValidationError(str(exc)) from exc
         object.__setattr__(self, "chart_type", chart_t)
 
-        agg = (
-            AggregationType.from_str(self.aggregation)
-            if isinstance(self.aggregation, str)
-            else self.aggregation
-        )
+        try:
+            agg = (
+                AggregationType.from_str(self.aggregation)
+                if isinstance(self.aggregation, str)
+                else self.aggregation
+            )
+        except ValueError as exc:
+            raise ChartValidationError(str(exc)) from exc
         object.__setattr__(self, "aggregation", agg)
 
         if isinstance(self.color_palette, str):

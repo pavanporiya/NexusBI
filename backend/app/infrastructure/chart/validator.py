@@ -19,6 +19,7 @@ from app.domain.enums import AggregationType, ChartType
 from app.domain.exceptions import ChartValidationError
 from app.domain.value_objects.chart import ChartConfiguration
 from app.domain.value_objects.query import QueryResult
+from app.infrastructure.chart.registry import ChartBuilderRegistry
 
 
 class DefaultChartValidator(IChartValidator):
@@ -30,29 +31,29 @@ class DefaultChartValidator(IChartValidator):
         Raises:
             ChartValidationError: If validation rules are violated.
         """
-        # 1. Unsupported Chart Type
-        try:
-            chart_t = ChartType.from_str(config.chart_type)
-        except ValueError as exc:
-            raise ChartValidationError(
-                f"Unsupported chart type: {config.chart_type}"
-            ) from exc
+        chart_t = config.chart_type
 
-        # 2. Empty Dataset
-        if not result.rows:
-            raise ChartValidationError(
-                "Dataset is empty. Cannot generate chart from empty query results."
-            )
+        # 1. Unsupported or invalid chart type
+        try:
+            ChartType.from_str(chart_t)
+        except ValueError as exc:
+            raise ChartValidationError(str(exc)) from exc
+
+        ChartBuilderRegistry.ensure_initialized()
+        if chart_t not in ChartBuilderRegistry.supported_types():
+            raise ChartValidationError(f"Invalid chart type: {chart_t.value}")
+
+        # 2. Empty dataset
+        if not result.rows or result.row_count == 0:
+            raise ChartValidationError("Dataset is empty")
 
         column_names = {c.name for c in result.columns}
 
-        # 3. Invalid Aggregation
+        # 3. Invalid aggregation
         try:
             AggregationType.from_str(config.aggregation)
         except ValueError as exc:
-            raise ChartValidationError(
-                f"Invalid aggregation type: {config.aggregation}"
-            ) from exc
+            raise ChartValidationError(str(exc)) from exc
 
         # 4. Duplicate Series Validation
         if config.y_axis_columns:
