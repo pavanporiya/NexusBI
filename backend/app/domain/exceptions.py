@@ -29,3 +29,19 @@ class InvalidRoleError(DomainValidationError):
 
 class UserValidationError(DomainValidationError):
     """Raised when user domain invariants are violated."""
+
+
+class InvalidQueryError(DomainValidationError):
+    """Raised when a query fails validation, syntax, or security checks."""
+
+
+class QueryTimeoutError(DomainValidationError):
+    """Raised when a query execution times out."""
+
+
+class QueryExecutionError(DomainValidationError):
+    """Raised when a query execution fails."""
+
+
+class ChartValidationError(DomainValidationError):
+    """Raised when chart configuration or data fails chart validation rules."""

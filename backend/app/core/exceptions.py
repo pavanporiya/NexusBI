@@ -19,7 +19,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.core.logging import get_logger
+from app.core.logging import get_correlation_id, get_logger
 
 logger = get_logger(__name__)
 
@@ -248,6 +248,60 @@ class UnsafeSQLError(SQLValidationError):
         )
 
 
+class InvalidQueryError(NexusBIError):
+    """Raised when a query fails AST safety, parameter, or syntax validation."""
+
+    def __init__(
+        self,
+        message: str = "Invalid SQL query",
+        detail: str | None = None,
+    ) -> None:
+        super().__init__(
+            code="NBI-2002",
+            message=message,
+            status_code=400,
+            detail=detail,
+        )
+
+
+class QueryTimeoutError(NexusBIError):
+    """Raised when query execution exceeds the configured timeout."""
+
+    def __init__(
+        self,
+        timeout_seconds: float = 0.0,
+        detail: str | None = None,
+    ) -> None:
+        msg = (
+            f"Query execution timed out ({timeout_seconds}s limit)"
+            if timeout_seconds > 0
+            else "Query execution timed out"
+        )
+        super().__init__(
+            code="NBI-3002",
+            message=msg,
+            status_code=504,
+            detail=detail
+            or "The query execution exceeded the maximum allowed runtime.",
+        )
+
+
+class QueryExecutionError(NexusBIError):
+    """Raised when a query execution encounters a runtime database error."""
+
+    def __init__(
+        self,
+        message: str = "Query execution failed",
+        detail: str | None = None,
+    ) -> None:
+        super().__init__(
+            code="NBI-3001",
+            message=message,
+            status_code=500,
+            detail=detail,
+        )
+
+
 class PromptInjectionError(NexusBIError):
     """Input contains suspected prompt injection content."""
 
@@ -420,20 +474,31 @@ def register_exception_handlers(app: FastAPI) -> None:
         request: Request, exc: NexusBIError
     ) -> JSONResponse:
         """Handle all NexusBI application exceptions."""
+        request_id = getattr(request.state, "request_id", None) or get_correlation_id()
         logger.error(
             "Application error",
-            error_code=exc.code,
+            request_id=request_id,
+            exception_type=type(exc).__name__,
             message=exc.message,
+            error_code=exc.code,
+            status=exc.status_code,
             status_code=exc.status_code,
             detail=exc.detail,
             path=request.url.path,
             method=request.method,
         )
+
+        from app.core.config import settings
+
+        detail = exc.detail
+        if exc.status_code >= 500 and not (settings.is_development or settings.DEBUG):
+            detail = "An internal server error occurred."
+
         return _build_error_response(
             status_code=exc.status_code,
             code=exc.code,
             message=exc.message,
-            detail=exc.detail,
+            detail=detail,
         )
 
     @app.exception_handler(RequestValidationError)
@@ -451,10 +516,16 @@ def register_exception_handlers(app: FastAPI) -> None:
                 }
             )
 
+        request_id = getattr(request.state, "request_id", None) or get_correlation_id()
         logger.warning(
             "Request validation failed",
+            request_id=request_id,
+            exception_type="RequestValidationError",
+            message="Request validation failed",
             path=request.url.path,
             method=request.method,
+            status=422,
+            status_code=422,
             error_count=len(errors),
         )
         return _build_error_response(
@@ -481,8 +552,13 @@ def register_exception_handlers(app: FastAPI) -> None:
         }
         error_code = code_map.get(status_code, "NBI-9999")
 
+        request_id = getattr(request.state, "request_id", None) or get_correlation_id()
         logger.warning(
             "HTTP error",
+            request_id=request_id,
+            exception_type=type(exc).__name__,
+            message=str(exc.detail),
+            status=status_code,
             status_code=status_code,
             detail=str(exc.detail),
             path=request.url.path,
@@ -503,11 +579,16 @@ def register_exception_handlers(app: FastAPI) -> None:
         In production, the detail field is sanitised to prevent
         leaking internal stack traces to the client.
         """
+        request_id = getattr(request.state, "request_id", None) or get_correlation_id()
         logger.exception(
             "Unhandled server exception",
+            request_id=request_id,
+            exception_type=type(exc).__name__,
+            message=str(exc),
             path=request.url.path,
             method=request.method,
-            exception_type=type(exc).__name__,
+            status=500,
+            status_code=500,
         )
 
         from app.core.config import settings

@@ -106,7 +106,10 @@ class TestSettingsProperties:
     def test_is_production_property(self) -> None:
         from app.core.config import Settings
 
-        s = Settings(ENV="production", SECRET_KEY=SecretStr("secure_key"))  # type: ignore[arg-type]
+        s = Settings(
+            ENV="production",  # type: ignore[arg-type]
+            SECRET_KEY=SecretStr("secure_key_at_least_32_characters_long"),
+        )
         assert s.is_production is True
 
 

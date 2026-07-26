@@ -19,11 +19,13 @@ from app.api.dependencies.auth import (
 )
 from app.application.dto.auth_dto import (
     LoginDTO,
+    LogoutResponseDTO,
     RegisterDTO,
     TokenDTO,
     TokenRefreshDTO,
     UserDTO,
 )
+from app.application.dto.error_dto import create_error_responses
 from app.application.use_cases import (
     LoginUserUseCase,
     LogoutUserUseCase,
@@ -40,6 +42,14 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
     response_model=UserDTO,
     status_code=status.HTTP_201_CREATED,
     summary="Register a new user account",
+    operation_id="auth_register_user",
+    response_description="Newly created user account profile.",
+    responses=create_error_responses(400, 409, 422, 500),
+    description=(
+        "Registers a new user with email and password credentials. "
+        "Validates password complexity, checks for duplicate email registration, "
+        "and assigns the default Viewer role."
+    ),
 )
 def register_user(
     dto: RegisterDTO,
@@ -54,6 +64,14 @@ def register_user(
     response_model=TokenDTO,
     status_code=status.HTTP_200_OK,
     summary="Authenticate user and issue tokens",
+    operation_id="auth_login_user",
+    response_description="Access token and refresh token payload.",
+    responses=create_error_responses(400, 401, 422, 500),
+    description=(
+        "Authenticates user email and password credentials, records client IP "
+        "and User-Agent in session tracking, and returns a signed JWT access token "
+        "and an opaque refresh token."
+    ),
 )
 def login_user(
     dto: LoginDTO,
@@ -71,6 +89,13 @@ def login_user(
     response_model=TokenDTO,
     status_code=status.HTTP_200_OK,
     summary="Rotate refresh token and issue new token pair",
+    operation_id="auth_refresh_token",
+    response_description="Rotated access token and new refresh token pair.",
+    responses=create_error_responses(400, 401, 422, 500),
+    description=(
+        "Validates an active opaque refresh token, revokes the preceding session, "
+        "and issues a fresh JWT access token and new refresh token pair."
+    ),
 )
 def refresh_token(
     dto: TokenRefreshDTO,
@@ -85,18 +110,26 @@ def refresh_token(
 
 @router.post(
     "/logout",
+    response_model=LogoutResponseDTO,
     status_code=status.HTTP_200_OK,
     summary="Revoke user session",
+    operation_id="auth_logout_user",
+    response_description="Session revocation status confirmation message.",
+    responses=create_error_responses(400, 401, 422, 500),
+    description=(
+        "Revokes the active user session associated with the supplied refresh token. "
+        "Requires a valid JWT Bearer authentication token in the Authorization header."
+    ),
 )
 def logout_user(
     dto: TokenRefreshDTO,
     current_user: Annotated[User, Depends(get_current_user)],
     use_case: Annotated[LogoutUserUseCase, Depends(get_logout_user_use_case)],
-) -> dict[str, str]:
+) -> LogoutResponseDTO:
     """Revoke active session for authenticated user."""
     _ = current_user
     use_case.execute(dto.refresh_token)
-    return {"message": "Successfully logged out"}
+    return LogoutResponseDTO(message="Successfully logged out")
 
 
 @router.get(
@@ -104,6 +137,14 @@ def logout_user(
     response_model=UserDTO,
     status_code=status.HTTP_200_OK,
     summary="Get current authenticated user profile",
+    operation_id="auth_get_me",
+    response_description="Profile details, roles, and permissions of the active user.",
+    responses=create_error_responses(401, 500),
+    description=(
+        "Retrieves detailed profile information for the currently authenticated user, "
+        "including list of assigned roles and resolved permission action strings. "
+        "Requires a valid JWT Bearer authentication token."
+    ),
 )
 def get_me(
     current_user: Annotated[User, Depends(get_current_user)],
