@@ -1,126 +1,252 @@
-# NexusBI – Enterprise Analytics Copilot
+# NexusBI
 
-This repository contains the architecture, directory layout, and planning specifications for **NexusBI**, an enterprise-grade AI-powered Business Intelligence platform.
+NexusBI is an enterprise analytics backend built as an extensible, production-ready BI service. The current implementation focuses on a Python FastAPI backend using Clean Architecture patterns, dependency injection, repository-based persistence, DTOs, and JWT-secured REST APIs.
 
-NexusBI translates business questions in natural language into optimized Snowflake SQL, executes the queries securely, formats the results, runs predictive statistical forecasting, and displays interactive data visualizations with AI-driven prescriptive recommendations.
+This repository reflects the implemented backend service only and is suitable for API-driven analytics, workspace management, role-based access control, universal SQL execution, chart previews, and PostgreSQL connector discovery.
 
----
+## Features
 
-## 📘 Architecture Documentation
+### Authentication & Security
+- Register new users
+- Login with JWT access tokens
+- Refresh tokens and session rotation
+- Logout and token revocation
+- Current authenticated user endpoint
+- Role-based access control (RBAC)
+- Structured JSON logging for requests and errors
 
-### Phase 1 — Software Planning & Architecture
-- [nexusbi_architecture_planning.md](./docs/architecture/nexusbi_architecture_planning.md) — Executive summary, functional/non-functional requirements, system scope, user roles, core modules, high-level architecture, technology stack, risks, and roadmap.
+### Enterprise Management
+- User management API
+- Role management API
+- Organization management API
+- Workspace management API
+- Workspace membership management API
 
-### Phase 2 — Architecture Review & Implementation-Ready Specifications
+### Analytics & BI
+- Dashboard management
+- Widget management
+- Dataset management
+- Report management
 
-| Task | Document | Summary |
-|:---|:---|:---|
-| **Task 1** | [Architecture Review](./docs/architecture/phase2_task1_architecture_review.md) | 13 findings simplifying V1 (removed K8s, Qdrant, Celery). Added rate limiting, tenant isolation, error taxonomy. |
-| **Task 2** | [KPI Catalog](./docs/architecture/phase2_task2_kpi_catalog.md) | 25 enterprise KPIs with formulas, owners, visualizations, and example interpretations. |
-| **Task 3** | [User Journeys](./docs/architecture/phase2_task3_user_journeys.md) | 5 complete role-based journeys (CEO, Analyst, Data Engineer, Ops Manager, Admin). |
-| **Task 4** | [AI Decision Pipeline](./docs/architecture/phase2_task4_ai_pipeline.md) | 19-stage pipeline from NL input to rendered chart with failure/recovery strategies. |
-| **Task 5** | [Version Planning](./docs/architecture/phase2_task5_version_planning.md) | 4-version technology roadmap (V1 MVP → V4 Cognitive Enterprise). |
-| **Task 6** | [Risk Assessment](./docs/architecture/phase2_task6_risk_assessment.md) | 28 risks across 9 categories, prioritized P0–P3. |
-| **Task 7** | [Architecture Validation](./docs/architecture/phase2_task7_architecture_validation.md) | Final design review, 15 ADRs, SLI/SLOs, and pre-development checklist. |
-| **Phase 2.1** | [Repository Blueprint](./docs/architecture/phase2_1_repository_blueprint.md) | Full implementation-ready repository structure, module responsibilities, logging, testing, and configurations. |
-| **Phase 2.2** | [Data Warehouse Blueprint](./docs/architecture/phase2_2_data_warehouse_blueprint.md) | Enterprise data model, business domains, star schemas, Snowflake optimizations, and data governance. |
-| **Phase 2.3** | [API & Service Blueprint](./docs/architecture/phase2_3_api_service_blueprint.md) | Backend service design, REST/WebSocket contracts, request lifecycles, service communication rules, and error registries. |
-| **Phase 2.4** | [AI Intelligence Blueprint](./docs/architecture/phase2_4_ai_intelligence_blueprint.md) | AI vision, capability matrix, prompt engineering flow, memory caches, reasoning strategies, and model selection patterns. |
-| **Phase 2.5** | [Product Experience Blueprint](./docs/architecture/phase2_5_product_experience_blueprint.md) | Executive UX principles, detailed user personas, navigation layout trees, component design systems, and interaction standards. |
-| **Phase 2.8** | [Enterprise Readiness Package](./docs/architecture/phase2_8_enterprise_readiness_package.md) | 20 Architecture Decision Records, 25 system diagrams (Mermaid), a 12-sprint project plan, Definition of Done checklists, and interview prep guides. |
+### Universal Engines
+- Universal Query Engine
+  - Validate SQL
+  - Execute SQL
+  - Explain SQL
+  - Dataset preview
+- Universal Chart Engine
+  - Generate chart drafts
+  - Preview chart models
+  - Validate chart payloads
 
-### Missing Sections Added to Blueprint
+### Connector Framework
+- PostgreSQL connector implementation
+- Connector registry for external data sources
+- Connection testing
+- Schema discovery
+- Table discovery
+- Column discovery
 
-| Section | Document | Summary |
-|:---|:---|:---|
-| **Section 1** | [Repository Blueprint](./docs/architecture/phase1_section1_repository_blueprint.md) | Full enterprise directory layout specifications with folder-level ownership and guidelines. |
-| **Section 2** | [Database Blueprint](./docs/architecture/phase1_section2_database_blueprint.md) | Relational + vector schema topology, index/partition rules, SCD strategies, and naming standards. |
-| **Section 3** | [API Blueprint](./docs/architecture/phase1_section3_api_blueprint.md) | REST and WebSocket endpoints complete with request/response models, rate limiting, and errors. |
-| **Section 4** | [UI Blueprint](./docs/architecture/phase1_section4_ui_blueprint.md) | Complete frontend page designs, widgets, responsive layout behavior, and accessibility policies. |
+## Architecture
 
----
+NexusBI uses Clean Architecture to strictly separate the API layer from application use cases, domain logic, and infrastructure adapters.
 
-## 📂 Repository Structure
+- `app/api` exposes HTTP endpoints, request validation, and OpenAPI metadata
+- `app/application` implements DTOs, services, and use case orchestration
+- `app/domain` contains core entities, repository interfaces, value objects, and business rules
+- `app/infrastructure` provides concrete SQLAlchemy, Redis, connector, JWT, and mapper implementations
+- `app/core` manages configuration, dependency injection, middleware, exceptions, and logging
 
-```text
-NexusBI/
-├── docs/                               # System Documentation
-│   └── architecture/                   # Architecture & Review Documents
-│       ├── nexusbi_architecture_planning.md
-│       ├── phase1_section1_repository_blueprint.md
-│       ├── phase1_section2_database_blueprint.md
-│       ├── phase1_section3_api_blueprint.md
-│       ├── phase1_section4_ui_blueprint.md
-│       ├── phase2_1_repository_blueprint.md
-│       ├── phase2_2_data_warehouse_blueprint.md
-│       ├── phase2_3_api_service_blueprint.md
-│       ├── phase2_4_ai_intelligence_blueprint.md
-│       ├── phase2_5_product_experience_blueprint.md
-│       ├── phase2_8_enterprise_readiness_package.md
-│       ├── phase2_task1_architecture_review.md
-│       ├── phase2_task2_kpi_catalog.md
-│       ├── ...
-│
-├── backend/                            # FastAPI Backend Service (Python)
-│   ├── app/
-│   │   ├── api/                        # Routers, request validators
-│   │   ├── core/                       # Security, config, middleware
-│   │   ├── domain/                     # Business entities, use cases, interfaces
-│   │   └── infrastructure/             # DB drivers, LLM clients, vector search
-│   └── README.md
-│
-├── frontend/                           # React SPA (Tailwind, Redux, ECharts)
-│   ├── src/
-│   │   ├── components/                 # Reusable UI widgets
-│   │   ├── features/                   # State slices, RTK Query hooks
-│   │   └── routes/                     # Page routing and layouts
-│   └── README.md
-│
-├── dbt/                                # Semantic Layer & Data Transformations
-│   ├── models/                         # Warehouse model definitions
-│   ├── seeds/                          # Business glossary seeds
-│   └── README.md
-│
-├── deploy/                             # Deployment Configurations
-│   ├── kubernetes/                     # K8s manifests (V3+)
-│   ├── terraform/                      # IaC configurations (V3+)
-│   └── README.md
-│
-└── README.md                           # This file
+### Architecture Diagram
+
+```mermaid
+flowchart LR
+  API["API Layer\n(FastAPI Routers / OpenAPI)"]
+  App["Application Layer\n(DTOs, Services, Use Cases)"]
+  Domain["Domain Layer\n(Entities, Repositories, Value Objects)"]
+  Infra["Infrastructure Layer\n(SQLAlchemy, Redis, JWT, Connectors)"]
+  Data["Data Stores\n(PostgreSQL, Redis)"]
+
+  API --> App
+  App --> Domain
+  App --> Infra
+  Infra --> Data
 ```
 
----
+## Folder Structure
 
-## 🏗️ V1 Technology Stack (Approved)
+```text
+backend/
+├── app/
+│   ├── api/
+│   │   ├── dependencies/
+│   │   └── v1/
+│   │       └── routers/
+│   │           ├── auth.py
+│   │           ├── charts.py
+│   │           ├── connectors.py
+│   │           ├── dashboards.py
+│   │           ├── datasets.py
+│   │           ├── health.py
+│   │           ├── organizations.py
+│   │           ├── query.py
+│   │           ├── reports.py
+│   │           ├── roles.py
+│   │           ├── users.py
+│   │           ├── widgets.py
+│   │           └── workspaces.py
+│   ├── application/
+│   │   ├── dto/
+│   │   ├── interfaces/
+│   │   ├── services/
+│   │   └── use_cases/
+│   ├── core/
+│   ├── domain/
+│   │   ├── connectors/
+│   │   ├── entities/
+│   │   ├── repositories/
+│   │   └── value_objects/
+│   ├── infrastructure/
+│   │   ├── chart/
+│   │   │   └── builders/
+│   │   ├── connectors/
+│   │   ├── database/
+│   │   ├── mappers/
+│   │   ├── query/
+│   │   ├── repositories/
+│   │   └── services/
+│   └── main.py
+```
 
-| Layer | Technology | Justification |
-|:---|:---|:---|
-| **Backend** | Python 3.13 + FastAPI + uv | Async-native, high-speed Astral packaging, auto OpenAPI docs |
-| **Frontend** | React 19 + Next.js 15 + Redux Toolkit + Tailwind | Component reuse, React Server Components ready, predictable state |
-| **Visualization** | Apache ECharts | Single library, canvas rendering, rich interactivity |
-| **Database** | PostgreSQL 15 + pgvector | Metadata, audit logs, and vector search in one DB |
-| **Cache** | Redis (single instance) | Sessions, conversation memory, semantic query cache |
-| **Data Warehouse** | Snowflake | Target analytical database with native RLS/CLS |
-| **AI Orchestration** | LangGraph | Stateful agent workflows with self-healing loops |
-| **Primary LLM** | Claude 3.5 Sonnet | Best-in-class SQL generation, 200K context window |
-| **Lightweight LLM** | Claude 3 Haiku | Cost-efficient intent classification and chart selection |
-| **Deployment** | Docker Compose | Simple orchestration for V1 scale (<50 users) |
+## Technology Stack
 
----
+- Backend: Python 3.13, FastAPI, SQLAlchemy, Dependency Injector
+- Database: PostgreSQL
+- Cache: Redis
+- API Docs: OpenAPI / Swagger
+- Testing: pytest
+- Quality Tools: Ruff, MyPy
 
-## 🚀 Pre-Development Checklist
+## API Modules
 
-- [x] Python packaging migrated to high-speed Astral `uv` toolchains
-- [x] Local dev Docker Compose file created and verified (`postgres`, `redis`, `backend` containers)
-- [x] CI/CD pipelines configured (Lint, Format, Types, Unit tests) for backend, frontend, and dbt
-- [x] Workspace code quality and editor configs established (`ruff`, `mypy`, `pre-commit`, `.editorconfig`)
-- [ ] Snowflake dev account provisioned with sample data
-- [ ] OIDC test identity provider configured
-- [ ] Mock LLM response fixtures created for 20 test queries
-- [ ] KPI catalog loaded into PostgreSQL seed data
-- [ ] Error code registry (NBI-1001–1007) documented
-- [ ] Security threat model reviewed
-- [ ] SLI/SLO definitions agreed upon
+- **Authentication**: register, login, refresh token, logout, current user
+- **User Management**: user listing, retrieval, and profile operations
+- **Role Management**: RBAC role CRUD and permission assignment
+- **Organization Management**: enterprise organization CRUD
+- **Workspace Management**: workspace CRUD and membership APIs
+- **Dashboard Management**: dashboard creation, retrieval, update, delete
+- **Widget Management**: widget CRUD and layout operations
+- **Dataset Management**: dataset CRUD and preview endpoints
+- **Report Management**: analytical report lifecycle APIs
+- **Universal Query Engine**: SQL validation, execution, explain, dataset preview
+- **Universal Chart Engine**: chart generation, preview, validation
+- **Connector Framework**: PostgreSQL connector, registry, connection testing, discovery
 
-For detailed instructions on running, testing, and formatting this workspace, see the [Developer Setup Guide](./docs/developer/local_setup.md).
+## Installation
 
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/<your-org>/NexusBI.git
+   cd NexusBI/backend
+   ```
+
+2. Create a Python virtual environment:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   uv install
+   ```
+
+4. Create an environment file:
+   ```bash
+   cp .env.example .env
+   ```
+   Update the values for PostgreSQL, Redis, and security settings.
+
+## Environment Variables
+
+The backend loads settings from `.env` and supports environment-specific overrides via `.env.{ENV}`.
+
+Required values for the current backend implementation:
+
+- `SECRET_KEY`
+- `ACCESS_TOKEN_EXPIRE_MINUTES`
+- `REFRESH_TOKEN_EXPIRE_DAYS`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `POSTGRES_HOST`
+- `POSTGRES_PORT`
+- `POSTGRES_DB`
+- `REDIS_HOST`
+- `REDIS_PORT`
+- `REDIS_DB`
+- `REDIS_PASSWORD`
+- `HOST`
+- `PORT`
+- `ENV`
+- `LOG_LEVEL`
+
+## Running
+
+Start the backend locally:
+
+```bash
+cd backend
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+The API is available at `http://localhost:8000`.
+
+## Testing
+
+Run the quality and test suite with:
+
+```bash
+cd backend
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy .
+uv run pytest
+```
+
+This backend currently includes **923 automated tests**.
+
+## API Documentation
+
+Swagger UI is available at:
+
+- `http://localhost:8000/docs`
+
+OpenAPI schema is available at:
+
+- `http://localhost:8000/openapi.json`
+
+## Project Statistics
+
+- 60+ REST APIs
+- 923 Tests
+- Clean Architecture
+- JWT Authentication
+- RBAC
+- Query Engine
+- Chart Engine
+- Connector Framework
+
+## Future Enhancements
+The following features are planned for future releases and are **not part of the current implementation**:
+
+- MySQL Connector
+- Snowflake Connector
+- BigQuery Connector
+- AI Copilot
+- Frontend Dashboard Builder
+- Forecasting
+- Scheduled Reports
+
+## License
+
+MIT
