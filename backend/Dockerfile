@@ -32,6 +32,8 @@ COPY --from=builder /build/site-packages/bin /usr/local/bin
 
 # Copy app code
 COPY app/ ./app/
+COPY alembic.ini ./
+COPY migrations/ ./migrations/
 
 # Set ownership
 RUN chown -R appuser:appgroup /app
@@ -43,4 +45,3 @@ EXPOSE 8000
 
 # Run FastAPI app via uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
