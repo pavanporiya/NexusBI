@@ -10,7 +10,12 @@ from app.domain.connectors.exceptions import (
     UnsupportedConnectorError,
 )
 from app.domain.connectors.interface import DatabaseConnector
-from app.domain.connectors.types import ConnectorType
+from app.domain.connectors.types import (
+    ColumnMetadata,
+    ConnectorType,
+    ForeignKeyMetadata,
+    PrimaryKeyMetadata,
+)
 
 __all__ = [
     "AuthenticationFailedError",
@@ -22,4 +27,7 @@ __all__ = [
     "MetadataDiscoveryError",
     "QueryExecutionError",
     "UnsupportedConnectorError",
+    "ColumnMetadata",
+    "PrimaryKeyMetadata",
+    "ForeignKeyMetadata",
 ]

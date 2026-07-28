@@ -157,5 +157,7 @@ def test_database_connector_is_abstract_and_declares_all_operations() -> None:
         "list_tables",
         "list_views",
         "list_columns",
+        "list_primary_keys",
+        "list_foreign_keys",
     }
     assert get_type_hints(DatabaseConnector.execute)["return"] is not None

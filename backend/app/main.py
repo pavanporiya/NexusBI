@@ -135,6 +135,13 @@ OPENAPI_TAGS: list[dict[str, Any]] = [
             "by typed chart strategies."
         ),
     },
+    {
+        "name": "Connector Management",
+        "description": (
+            "Connector discovery and connection verification endpoints for "
+            "external data sources."
+        ),
+    },
 ]
 
 
@@ -315,6 +322,7 @@ def _register_routers(app: FastAPI, api_prefix: str) -> None:
     from app.api.health import router as health_router
     from app.api.v1.routers.auth import router as auth_router
     from app.api.v1.routers.charts import router as charts_router
+    from app.api.v1.routers.connectors import router as connectors_router
     from app.api.v1.routers.dashboards import router as dashboards_router
     from app.api.v1.routers.datasets import router as datasets_router
     from app.api.v1.routers.organizations import router as organizations_router
@@ -390,6 +398,12 @@ def _register_routers(app: FastAPI, api_prefix: str) -> None:
     # Mount Workspace Management REST API endpoints
     app.include_router(
         workspaces_router,
+        prefix=api_prefix,
+    )
+
+    # Mount Connector Management REST API endpoints
+    app.include_router(
+        connectors_router,
         prefix=api_prefix,
     )
 

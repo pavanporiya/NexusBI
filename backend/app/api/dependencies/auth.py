@@ -13,6 +13,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from app.application.services import QueryService
+from app.application.services.connector_service import ConnectorService
 from app.application.services.interfaces import (
     IAuthorizationService,
     IPasswordHasher,
@@ -714,6 +715,13 @@ def get_query_service(
         planner=planner,
         dataset_repository=dataset_repo,
     )
+
+
+def get_connector_service() -> ConnectorService:
+    """Dependency provider for ConnectorService."""
+    from app.application.services.connector_service import ConnectorService
+
+    return ConnectorService()
 
 
 def get_chart_service() -> ChartService:

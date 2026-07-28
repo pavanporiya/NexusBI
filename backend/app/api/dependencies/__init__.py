@@ -6,6 +6,7 @@ Exports reusable FastAPI dependencies for authentication and authorization.
 from app.api.dependencies.auth import (
     get_authorization_service,
     get_chart_service,
+    get_connector_service,
     get_current_user,
     get_current_user_use_case,
     get_get_user_use_case,
@@ -48,6 +49,7 @@ __all__ = [
     "get_token_service",
     "get_update_user_use_case",
     "get_user_repository",
+    "get_connector_service",
     "require_all_permissions",
     "require_any_permission",
     "require_permission",

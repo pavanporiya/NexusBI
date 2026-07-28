@@ -5,6 +5,12 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
 
+from app.domain.connectors.types import (
+    ColumnMetadata,
+    ForeignKeyMetadata,
+    PrimaryKeyMetadata,
+)
+
 
 class DatabaseConnector(ABC):
     """Technology-neutral contract for database connectivity and discovery."""
@@ -54,5 +60,17 @@ class DatabaseConnector(ABC):
     @abstractmethod
     def list_columns(
         self, table_name: str, schema: str | None = None
-    ) -> Sequence[Mapping[str, object]]:
+    ) -> Sequence[ColumnMetadata]:
         """List column metadata for a table or view."""
+
+    @abstractmethod
+    def list_primary_keys(
+        self, table_name: str, schema: str | None = None
+    ) -> Sequence[PrimaryKeyMetadata]:
+        """List primary key constraints for a table."""
+
+    @abstractmethod
+    def list_foreign_keys(
+        self, table_name: str, schema: str | None = None
+    ) -> Sequence[ForeignKeyMetadata]:
+        """List foreign key constraints for a table."""
