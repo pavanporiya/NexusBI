@@ -37,6 +37,7 @@ logs/
 .next/
 
 # IDEs and editors
+.gemini/
 .idea/
 .project
 .classpath
