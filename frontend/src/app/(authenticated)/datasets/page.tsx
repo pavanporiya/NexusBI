@@ -9,7 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -76,7 +82,8 @@ export default function DatasetsPage() {
           source_type: "postgres",
           object_type: "query",
           object_name: null,
-          sql_query: "SELECT c.id, c.email, COUNT(o.id) as total_orders FROM customers c LEFT JOIN orders o ON c.id = o.customer_id GROUP BY 1, 2",
+          sql_query:
+            "SELECT c.id, c.email, COUNT(o.id) as total_orders FROM customers c LEFT JOIN orders o ON c.id = o.customer_id GROUP BY 1, 2",
           connection_id: "conn_2",
           query_or_table: "SELECT ...",
           owner_id: "usr_1",
@@ -100,15 +107,32 @@ export default function DatasetsPage() {
     setPreviewing(true);
     setIsPreviewOpen(true);
     try {
-      const res = await apiClient.get<QueryResult>(`/query/preview-dataset/${id}?limit=10`);
+      const res = await apiClient.get<QueryResult>(
+        `/query/preview-dataset/${id}?limit=10`,
+      );
       setPreviewData(res);
     } catch {
       // Mock result fallback
       setPreviewData({
         rows: [
-          { id: "1001", region: "North America", revenue: 45200.0, margin: 0.34 },
-          { id: "1002", region: "Europe Central", revenue: 38900.5, margin: 0.28 },
-          { id: "1003", region: "Asia Pacific", revenue: 61200.0, margin: 0.42 },
+          {
+            id: "1001",
+            region: "North America",
+            revenue: 45200.0,
+            margin: 0.34,
+          },
+          {
+            id: "1002",
+            region: "Europe Central",
+            revenue: 38900.5,
+            margin: 0.28,
+          },
+          {
+            id: "1003",
+            region: "Asia Pacific",
+            revenue: 61200.0,
+            margin: 0.42,
+          },
         ],
         columns: [
           { name: "id", type: "INTEGER" },
@@ -116,14 +140,27 @@ export default function DatasetsPage() {
           { name: "revenue", type: "FLOAT" },
           { name: "margin", type: "FLOAT" },
         ],
-        column_types: { id: "INTEGER", region: "VARCHAR", revenue: "FLOAT", margin: "FLOAT" },
+        column_types: {
+          id: "INTEGER",
+          region: "VARCHAR",
+          revenue: "FLOAT",
+          margin: "FLOAT",
+        },
         execution_time: 0.042,
         row_count: 3,
         metadata: {
-          statistics: { query_plan: null, rows_scanned: 100, bytes_processed: 1024, cache_hit: true },
+          statistics: {
+            query_plan: null,
+            rows_scanned: 100,
+            bytes_processed: 1024,
+            cache_hit: true,
+          },
           execution_time: 0.042,
           row_count: 3,
-          columns: [{ name: "id", type: "INTEGER" }, { name: "region", type: "VARCHAR" }],
+          columns: [
+            { name: "id", type: "INTEGER" },
+            { name: "region", type: "VARCHAR" },
+          ],
           truncated: false,
           limit: 10,
           offset: 0,
@@ -141,8 +178,10 @@ export default function DatasetsPage() {
         name: newDataset.name,
         source_type: newDataset.source_type,
         object_type: newDataset.object_type,
-        object_name: newDataset.object_type === "table" ? newDataset.object_name : null,
-        sql_query: newDataset.object_type === "query" ? newDataset.sql_query : null,
+        object_name:
+          newDataset.object_type === "table" ? newDataset.object_name : null,
+        sql_query:
+          newDataset.object_type === "query" ? newDataset.sql_query : null,
         description: newDataset.description,
       });
       toast.success("Dataset created");
@@ -165,7 +204,9 @@ export default function DatasetsPage() {
           <div>
             <p className="font-medium text-foreground">{row.original.name}</p>
             <p className="font-mono text-2xs text-muted-foreground">
-              {row.original.object_type === "table" ? row.original.object_name : "SQL Query"}
+              {row.original.object_type === "table"
+                ? row.original.object_name
+                : "SQL Query"}
             </p>
           </div>
         </div>
@@ -184,7 +225,11 @@ export default function DatasetsPage() {
       accessorKey: "object_type",
       header: "Type",
       cell: ({ row }) => (
-        <Badge variant={row.original.object_type === "table" ? "secondary" : "default"}>
+        <Badge
+          variant={
+            row.original.object_type === "table" ? "secondary" : "default"
+          }
+        >
           {row.original.object_type}
         </Badge>
       ),
@@ -216,7 +261,9 @@ export default function DatasetsPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem><Edit className="mr-2 h-3.5 w-3.5" /> Edit Schema</DropdownMenuItem>
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-3.5 w-3.5" /> Edit Schema
+              </DropdownMenuItem>
               <DropdownMenuItem className="text-destructive focus:text-destructive">
                 <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete Dataset
               </DropdownMenuItem>
@@ -231,9 +278,12 @@ export default function DatasetsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Datasets</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Datasets
+          </h1>
           <p className="text-xs text-muted-foreground">
-            Semantic catalog of physical database tables, views, and custom SQL queries.
+            Semantic catalog of physical database tables, views, and custom SQL
+            queries.
           </p>
         </div>
         <Button size="sm" onClick={() => setIsCreateOpen(true)}>
@@ -254,7 +304,9 @@ export default function DatasetsPage() {
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Dataset Preview</DialogTitle>
-            <DialogDescription>Sample rows retrieved from the underlying query engine</DialogDescription>
+            <DialogDescription>
+              Sample rows retrieved from the underlying query engine
+            </DialogDescription>
           </DialogHeader>
 
           {previewing ? (
@@ -264,7 +316,12 @@ export default function DatasetsPage() {
           ) : previewData ? (
             <div className="space-y-3">
               <div className="flex items-center justify-between text-2xs font-mono text-muted-foreground bg-muted/40 p-2 rounded">
-                <span>Execution: {previewData.execution_time ? `${(previewData.execution_time * 1000).toFixed(1)} ms` : "N/A"}</span>
+                <span>
+                  Execution:{" "}
+                  {previewData.execution_time
+                    ? `${(previewData.execution_time * 1000).toFixed(1)} ms`
+                    : "N/A"}
+                </span>
                 <span>Rows: {previewData.row_count}</span>
               </div>
               <div className="overflow-x-auto max-h-80 border border-border rounded">
@@ -272,8 +329,14 @@ export default function DatasetsPage() {
                   <thead className="bg-card border-b border-border sticky top-0">
                     <tr>
                       {previewData.columns.map((c) => (
-                        <th key={c.name} className="p-2 font-mono text-2xs font-semibold text-muted-foreground border-r border-border last:border-r-0">
-                          {c.name} <span className="text-muted-foreground/60 font-normal">({c.type})</span>
+                        <th
+                          key={c.name}
+                          className="p-2 font-mono text-2xs font-semibold text-muted-foreground border-r border-border last:border-r-0"
+                        >
+                          {c.name}{" "}
+                          <span className="text-muted-foreground/60 font-normal">
+                            ({c.type})
+                          </span>
                         </th>
                       ))}
                     </tr>
@@ -282,7 +345,10 @@ export default function DatasetsPage() {
                     {previewData.rows.map((row, i) => (
                       <tr key={i} className="hover:bg-muted/30">
                         {previewData.columns.map((c) => (
-                          <td key={c.name} className="p-2 font-mono text-2xs border-r border-border last:border-r-0">
+                          <td
+                            key={c.name}
+                            className="p-2 font-mono text-2xs border-r border-border last:border-r-0"
+                          >
                             {String(row[c.name] ?? "")}
                           </td>
                         ))}
@@ -302,7 +368,9 @@ export default function DatasetsPage() {
           <form onSubmit={handleCreate}>
             <DialogHeader>
               <DialogTitle>Create Dataset</DialogTitle>
-              <DialogDescription>Register a new table or custom SQL query in the semantic layer.</DialogDescription>
+              <DialogDescription>
+                Register a new table or custom SQL query in the semantic layer.
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-3 py-4">
@@ -312,7 +380,9 @@ export default function DatasetsPage() {
                   placeholder="Orders Analytics Fact"
                   required
                   value={newDataset.name}
-                  onChange={(e) => setNewDataset({ ...newDataset, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewDataset({ ...newDataset, name: e.target.value })
+                  }
                 />
               </div>
 
@@ -321,9 +391,13 @@ export default function DatasetsPage() {
                   <Label>Source Adapter</Label>
                   <Select
                     value={newDataset.source_type}
-                    onValueChange={(val) => setNewDataset({ ...newDataset, source_type: val })}
+                    onValueChange={(val) =>
+                      setNewDataset({ ...newDataset, source_type: val })
+                    }
                   >
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="snowflake">Snowflake</SelectItem>
                       <SelectItem value="postgres">PostgreSQL</SelectItem>
@@ -335,11 +409,17 @@ export default function DatasetsPage() {
                   <Label>Object Classification</Label>
                   <Select
                     value={newDataset.object_type}
-                    onValueChange={(val) => setNewDataset({ ...newDataset, object_type: val })}
+                    onValueChange={(val) =>
+                      setNewDataset({ ...newDataset, object_type: val })
+                    }
                   >
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="table">Physical Table / View</SelectItem>
+                      <SelectItem value="table">
+                        Physical Table / View
+                      </SelectItem>
                       <SelectItem value="query">Custom SQL Query</SelectItem>
                     </SelectContent>
                   </Select>
@@ -353,7 +433,12 @@ export default function DatasetsPage() {
                     placeholder="PUBLIC.SALES_FACT"
                     required
                     value={newDataset.object_name}
-                    onChange={(e) => setNewDataset({ ...newDataset, object_name: e.target.value })}
+                    onChange={(e) =>
+                      setNewDataset({
+                        ...newDataset,
+                        object_name: e.target.value,
+                      })
+                    }
                   />
                 </div>
               ) : (
@@ -364,7 +449,12 @@ export default function DatasetsPage() {
                     className="font-mono text-xs"
                     required
                     value={newDataset.sql_query}
-                    onChange={(e) => setNewDataset({ ...newDataset, sql_query: e.target.value })}
+                    onChange={(e) =>
+                      setNewDataset({
+                        ...newDataset,
+                        sql_query: e.target.value,
+                      })
+                    }
                   />
                 </div>
               )}
@@ -374,13 +464,22 @@ export default function DatasetsPage() {
                 <Textarea
                   placeholder="Optional semantic description..."
                   value={newDataset.description}
-                  onChange={(e) => setNewDataset({ ...newDataset, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewDataset({
+                      ...newDataset,
+                      description: e.target.value,
+                    })
+                  }
                 />
               </div>
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreateOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">Create Dataset</Button>

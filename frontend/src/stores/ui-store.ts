@@ -21,6 +21,5 @@ export const useUIStore = create<UIState & UIActions>()((set) => ({
   setSidebarCollapsed: (collapsed: boolean) =>
     set({ sidebarCollapsed: collapsed }),
 
-  setCommandPaletteOpen: (open: boolean) =>
-    set({ commandPaletteOpen: open }),
+  setCommandPaletteOpen: (open: boolean) => set({ commandPaletteOpen: open }),
 }));

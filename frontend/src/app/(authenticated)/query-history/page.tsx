@@ -62,14 +62,20 @@ export default function QueryHistoryPage() {
       cell: ({ row }) => (
         <div className="flex items-center gap-2 max-w-[380px]">
           <History className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-          <span className="font-mono text-2xs text-foreground truncate">{row.original.sql}</span>
+          <span className="font-mono text-2xs text-foreground truncate">
+            {row.original.sql}
+          </span>
         </div>
       ),
     },
     {
       accessorKey: "user",
       header: "Executed By",
-      cell: ({ row }) => <span className="text-xs text-muted-foreground">{row.original.user}</span>,
+      cell: ({ row }) => (
+        <span className="text-xs text-muted-foreground">
+          {row.original.user}
+        </span>
+      ),
     },
     {
       accessorKey: "execution_time_ms",
@@ -94,7 +100,11 @@ export default function QueryHistoryPage() {
       header: "Status",
       cell: ({ row }) => (
         <div className="flex items-center gap-1.5">
-          <Badge variant={row.original.status === "success" ? "success" : "destructive"}>
+          <Badge
+            variant={
+              row.original.status === "success" ? "success" : "destructive"
+            }
+          >
             {row.original.status}
           </Badge>
           {row.original.cache_hit && <Badge variant="outline">Cache Hit</Badge>}
@@ -116,7 +126,11 @@ export default function QueryHistoryPage() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push(`/sql-editor?query=${encodeURIComponent(row.original.sql)}`)}
+          onClick={() =>
+            router.push(
+              `/sql-editor?query=${encodeURIComponent(row.original.sql)}`,
+            )
+          }
         >
           <Play className="mr-1 h-3.5 w-3.5" /> Open in Editor
         </Button>
@@ -128,8 +142,12 @@ export default function QueryHistoryPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Query History</h1>
-          <p className="text-xs text-muted-foreground">Audit log of all interactive SQL queries and execution telemetry.</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Query History
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Audit log of all interactive SQL queries and execution telemetry.
+          </p>
         </div>
       </div>
 

@@ -53,7 +53,9 @@ export default function SchedulesPage() {
           </div>
           <div>
             <p className="font-medium text-foreground">{row.original.name}</p>
-            <p className="text-2xs text-muted-foreground">{row.original.target_report}</p>
+            <p className="text-2xs text-muted-foreground">
+              {row.original.target_report}
+            </p>
           </div>
         </div>
       ),
@@ -70,7 +72,11 @@ export default function SchedulesPage() {
     {
       accessorKey: "recipient_email",
       header: "Recipient",
-      cell: ({ row }) => <span className="text-xs text-muted-foreground">{row.original.recipient_email}</span>,
+      cell: ({ row }) => (
+        <span className="text-xs text-muted-foreground">
+          {row.original.recipient_email}
+        </span>
+      ),
     },
     {
       accessorKey: "is_active",
@@ -86,9 +92,17 @@ export default function SchedulesPage() {
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
           <Button variant="ghost" size="icon" className="h-7 w-7">
-            {row.original.is_active ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+            {row.original.is_active ? (
+              <Pause className="h-3.5 w-3.5" />
+            ) : (
+              <Play className="h-3.5 w-3.5" />
+            )}
           </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-destructive"
+          >
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
@@ -100,8 +114,12 @@ export default function SchedulesPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Schedules</h1>
-          <p className="text-xs text-muted-foreground">Automated report dispatch timers and email subscription cron tasks.</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Schedules
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Automated report dispatch timers and email subscription cron tasks.
+          </p>
         </div>
         <Button size="sm">
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Schedule

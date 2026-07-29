@@ -72,8 +72,7 @@ export const SIDEBAR_NAV: NavGroup[] = [
 // ─── App Metadata ────────────────────────────────────────────────────────────
 
 export const APP_NAME = "NexusBI";
-export const APP_DESCRIPTION =
-  "Enterprise AI Analytics Platform";
+export const APP_DESCRIPTION = "Enterprise AI Analytics Platform";
 
 // ─── Sidebar Dimensions ─────────────────────────────────────────────────────
 

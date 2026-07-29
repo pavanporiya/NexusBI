@@ -43,7 +43,7 @@ const TableFooter = React.forwardRef<
     ref={ref}
     className={cn(
       "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
-      className
+      className,
     )}
     {...props}
   />
@@ -58,7 +58,7 @@ const TableRow = React.forwardRef<
     ref={ref}
     className={cn(
       "border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
-      className
+      className,
     )}
     {...props}
   />
@@ -73,7 +73,7 @@ const TableHead = React.forwardRef<
     ref={ref}
     className={cn(
       "h-9 px-3 text-left align-middle text-xs font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
-      className
+      className,
     )}
     {...props}
   />
@@ -88,7 +88,7 @@ const TableCell = React.forwardRef<
     ref={ref}
     className={cn(
       "px-3 py-2 align-middle text-sm [&:has([role=checkbox])]:pr-0",
-      className
+      className,
     )}
     {...props}
   />

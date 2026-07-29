@@ -35,8 +35,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           isLoading: false,
         }),
 
-      setUser: (user: User) =>
-        set({ user }),
+      setUser: (user: User) => set({ user }),
 
       logout: () =>
         set({
@@ -47,8 +46,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           isLoading: false,
         }),
 
-      setLoading: (loading: boolean) =>
-        set({ isLoading: loading }),
+      setLoading: (loading: boolean) => set({ isLoading: loading }),
     }),
     {
       name: "nexusbi-auth",
@@ -58,6 +56,6 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
-    }
-  )
+    },
+  ),
 );

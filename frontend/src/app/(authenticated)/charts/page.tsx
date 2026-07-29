@@ -2,9 +2,21 @@
 
 import React, { useState } from "react";
 import { BarChart3, LineChart, AreaChart, Plus } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import {
   ResponsiveContainer,
@@ -37,9 +49,12 @@ export default function ChartsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Chart Generator</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Chart Generator
+          </h1>
           <p className="text-xs text-muted-foreground">
-            Build interactive bar, line, and area charts backed by typed Universal Chart Engine strategies.
+            Build interactive bar, line, and area charts backed by typed
+            Universal Chart Engine strategies.
           </p>
         </div>
         <Button size="sm">
@@ -52,13 +67,17 @@ export default function ChartsPage() {
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle className="text-sm">Chart Configuration</CardTitle>
-            <CardDescription>Select metric dimension parameters</CardDescription>
+            <CardDescription>
+              Select metric dimension parameters
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1">
               <Label>Chart Strategy</Label>
               <Select value={chartType} onValueChange={setChartType}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="bar">Bar Chart</SelectItem>
                   <SelectItem value="line">Line Chart</SelectItem>
@@ -70,7 +89,9 @@ export default function ChartsPage() {
             <div className="space-y-1">
               <Label>X-Axis (Category)</Label>
               <Select value={xAxis} onValueChange={setXAxis}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="region">Region</SelectItem>
                 </SelectContent>
@@ -80,7 +101,9 @@ export default function ChartsPage() {
             <div className="space-y-1">
               <Label>Y-Axis (Metric)</Label>
               <Select value={yAxis} onValueChange={setYAxis}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="revenue">Revenue ($)</SelectItem>
                   <SelectItem value="orders">Order Count</SelectItem>
@@ -94,10 +117,18 @@ export default function ChartsPage() {
         <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
-              {chartType === "bar" && <BarChart3 className="h-4 w-4 text-primary" />}
-              {chartType === "line" && <LineChart className="h-4 w-4 text-primary" />}
-              {chartType === "area" && <AreaChart className="h-4 w-4 text-primary" />}
-              {yAxis === "revenue" ? "Regional Revenue Distribution ($)" : "Order Volume by Region"}
+              {chartType === "bar" && (
+                <BarChart3 className="h-4 w-4 text-primary" />
+              )}
+              {chartType === "line" && (
+                <LineChart className="h-4 w-4 text-primary" />
+              )}
+              {chartType === "area" && (
+                <AreaChart className="h-4 w-4 text-primary" />
+              )}
+              {yAxis === "revenue"
+                ? "Regional Revenue Distribution ($)"
+                : "Order Volume by Region"}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -108,7 +139,13 @@ export default function ChartsPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#232329" />
                     <XAxis dataKey={xAxis} stroke="#a1a1aa" fontSize={11} />
                     <YAxis stroke="#a1a1aa" fontSize={11} />
-                    <Tooltip contentStyle={{ backgroundColor: "#111113", borderColor: "#232329", color: "#fafafa" }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#111113",
+                        borderColor: "#232329",
+                        color: "#fafafa",
+                      }}
+                    />
                     <Bar dataKey={yAxis} fill="#3B82F6" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 ) : chartType === "line" ? (
@@ -116,16 +153,40 @@ export default function ChartsPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#232329" />
                     <XAxis dataKey={xAxis} stroke="#a1a1aa" fontSize={11} />
                     <YAxis stroke="#a1a1aa" fontSize={11} />
-                    <Tooltip contentStyle={{ backgroundColor: "#111113", borderColor: "#232329", color: "#fafafa" }} />
-                    <Line type="monotone" dataKey={yAxis} stroke="#3B82F6" strokeWidth={2} dot={{ fill: "#3B82F6" }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#111113",
+                        borderColor: "#232329",
+                        color: "#fafafa",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={yAxis}
+                      stroke="#3B82F6"
+                      strokeWidth={2}
+                      dot={{ fill: "#3B82F6" }}
+                    />
                   </ReLineChart>
                 ) : (
                   <ReAreaChart data={SAMPLE_DATA}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#232329" />
                     <XAxis dataKey={xAxis} stroke="#a1a1aa" fontSize={11} />
                     <YAxis stroke="#a1a1aa" fontSize={11} />
-                    <Tooltip contentStyle={{ backgroundColor: "#111113", borderColor: "#232329", color: "#fafafa" }} />
-                    <Area type="monotone" dataKey={yAxis} stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.2} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#111113",
+                        borderColor: "#232329",
+                        color: "#fafafa",
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey={yAxis}
+                      stroke="#3B82F6"
+                      fill="#3B82F6"
+                      fillOpacity={0.2}
+                    />
                   </ReAreaChart>
                 )}
               </ResponsiveContainer>

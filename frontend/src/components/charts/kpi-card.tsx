@@ -43,7 +43,7 @@ export function KpiCard({
               <span
                 className={cn(
                   "text-2xs font-medium",
-                  isPositive ? "text-green-400" : "text-red-400"
+                  isPositive ? "text-green-400" : "text-red-400",
                 )}
               >
                 {isPositive ? "+" : ""}

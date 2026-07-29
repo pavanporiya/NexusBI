@@ -38,7 +38,8 @@ export default function OrganizationsPage() {
   const fetchOrganizations = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get<PaginatedResponse<Organization>>("/organizations");
+      const res =
+        await apiClient.get<PaginatedResponse<Organization>>("/organizations");
       setOrganizations(res.items || []);
     } catch {
       // Fallback mock data if API unavailable
@@ -108,7 +109,9 @@ export default function OrganizationsPage() {
           </div>
           <div>
             <p className="font-medium text-foreground">{row.original.name}</p>
-            <p className="font-mono text-2xs text-muted-foreground">{row.original.slug}</p>
+            <p className="font-mono text-2xs text-muted-foreground">
+              {row.original.slug}
+            </p>
           </div>
         </div>
       ),
@@ -169,8 +172,12 @@ export default function OrganizationsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Organizations</h1>
-          <p className="text-xs text-muted-foreground">Manage multi-tenant enterprise organizations.</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Organizations
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Manage multi-tenant enterprise organizations.
+          </p>
         </div>
         <Button size="sm" onClick={() => setIsCreateOpen(true)}>
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Organization
@@ -190,7 +197,9 @@ export default function OrganizationsPage() {
           <form onSubmit={handleCreate}>
             <DialogHeader>
               <DialogTitle>Create Organization</DialogTitle>
-              <DialogDescription>Add a new tenant organization to the platform.</DialogDescription>
+              <DialogDescription>
+                Add a new tenant organization to the platform.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-3 py-4">
               <div className="space-y-1">
@@ -204,7 +213,9 @@ export default function OrganizationsPage() {
                     setNewOrg({
                       ...newOrg,
                       name: e.target.value,
-                      slug: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, "-"),
+                      slug: e.target.value
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]/g, "-"),
                     })
                   }
                 />
@@ -216,7 +227,9 @@ export default function OrganizationsPage() {
                   placeholder="acme-enterprise"
                   required
                   value={newOrg.slug}
-                  onChange={(e) => setNewOrg({ ...newOrg, slug: e.target.value })}
+                  onChange={(e) =>
+                    setNewOrg({ ...newOrg, slug: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-1">
@@ -225,12 +238,18 @@ export default function OrganizationsPage() {
                   id="org-desc"
                   placeholder="Optional organization details..."
                   value={newOrg.description}
-                  onChange={(e) => setNewOrg({ ...newOrg, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewOrg({ ...newOrg, description: e.target.value })
+                  }
                 />
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreateOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" loading={submitting}>

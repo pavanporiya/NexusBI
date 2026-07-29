@@ -17,7 +17,7 @@ export function CommandPalette() {
         setCommandPaletteOpen(!commandPaletteOpen);
       }
     },
-    [commandPaletteOpen, setCommandPaletteOpen]
+    [commandPaletteOpen, setCommandPaletteOpen],
   );
 
   useEffect(() => {

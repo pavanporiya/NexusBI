@@ -2,7 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { LayoutGrid, Plus, MoreHorizontal, Edit, Trash2, Globe, Lock } from "lucide-react";
+import {
+  LayoutGrid,
+  Plus,
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  Globe,
+  Lock,
+} from "lucide-react";
 import { DataTable } from "@/components/data-table/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,12 +40,17 @@ export default function DashboardsPage() {
   const [dashboards, setDashboards] = useState<Dashboard[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [newDashboard, setNewDashboard] = useState({ name: "", dataset_id: "ds_sales_fact", description: "" });
+  const [newDashboard, setNewDashboard] = useState({
+    name: "",
+    dataset_id: "ds_sales_fact",
+    description: "",
+  });
 
   const fetchDashboards = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get<PaginatedResponse<Dashboard>>("/dashboards");
+      const res =
+        await apiClient.get<PaginatedResponse<Dashboard>>("/dashboards");
       setDashboards(res.items || []);
     } catch {
       // Mock data fallback
@@ -59,7 +72,8 @@ export default function DashboardsPage() {
           name: "Infrastructure & API Latency Monitor",
           owner_id: "usr_1",
           dataset_id: "ds_customer_dim",
-          description: "System health probes, Redis query hit rates, and database load",
+          description:
+            "System health probes, Redis query hit rates, and database load",
           layout_json: {},
           is_public: false,
           is_active: true,
@@ -99,7 +113,9 @@ export default function DashboardsPage() {
           </div>
           <div>
             <p className="font-medium text-foreground">{row.original.name}</p>
-            <p className="text-2xs text-muted-foreground">{row.original.description || "No description"}</p>
+            <p className="text-2xs text-muted-foreground">
+              {row.original.description || "No description"}
+            </p>
           </div>
         </div>
       ),
@@ -108,8 +124,15 @@ export default function DashboardsPage() {
       accessorKey: "is_public",
       header: "Visibility",
       cell: ({ row }) => (
-        <Badge variant={row.original.is_public ? "default" : "outline"} className="gap-1">
-          {row.original.is_public ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+        <Badge
+          variant={row.original.is_public ? "default" : "outline"}
+          className="gap-1"
+        >
+          {row.original.is_public ? (
+            <Globe className="h-3 w-3" />
+          ) : (
+            <Lock className="h-3 w-3" />
+          )}
           {row.original.is_public ? "Public" : "Private"}
         </Badge>
       ),
@@ -133,7 +156,9 @@ export default function DashboardsPage() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem><Edit className="mr-2 h-3.5 w-3.5" /> Edit Canvas Layout</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Edit className="mr-2 h-3.5 w-3.5" /> Edit Canvas Layout
+            </DropdownMenuItem>
             <DropdownMenuItem className="text-destructive focus:text-destructive">
               <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete Dashboard
             </DropdownMenuItem>
@@ -147,8 +172,12 @@ export default function DashboardsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Dashboards</h1>
-          <p className="text-xs text-muted-foreground">Interactive analytical canvases and multi-widget monitoring boards.</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Dashboards
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Interactive analytical canvases and multi-widget monitoring boards.
+          </p>
         </div>
         <Button size="sm" onClick={() => setIsCreateOpen(true)}>
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Dashboard
@@ -168,7 +197,9 @@ export default function DashboardsPage() {
           <form onSubmit={handleCreate}>
             <DialogHeader>
               <DialogTitle>Create Dashboard</DialogTitle>
-              <DialogDescription>Initialize a new interactive dashboard layout.</DialogDescription>
+              <DialogDescription>
+                Initialize a new interactive dashboard layout.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-3 py-4">
               <div className="space-y-1">
@@ -177,7 +208,9 @@ export default function DashboardsPage() {
                   placeholder="ARR & Regional Sales"
                   required
                   value={newDashboard.name}
-                  onChange={(e) => setNewDashboard({ ...newDashboard, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewDashboard({ ...newDashboard, name: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-1">
@@ -185,12 +218,21 @@ export default function DashboardsPage() {
                 <Textarea
                   placeholder="Optional canvas summary..."
                   value={newDashboard.description}
-                  onChange={(e) => setNewDashboard({ ...newDashboard, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewDashboard({
+                      ...newDashboard,
+                      description: e.target.value,
+                    })
+                  }
                 />
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreateOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">Create Dashboard</Button>

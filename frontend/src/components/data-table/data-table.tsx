@@ -98,7 +98,7 @@ export function DataTable<TData, TValue>({
       headers.map((header) => {
         const val = row.getValue(header);
         return typeof val === "string" ? `"${val}"` : String(val ?? "");
-      })
+      }),
     );
 
     const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
@@ -122,9 +122,8 @@ export function DataTable<TData, TValue>({
               <Input
                 placeholder={searchPlaceholder}
                 value={
-                  (table
-                    .getColumn(searchColumn)
-                    ?.getFilterValue() as string) ?? ""
+                  (table.getColumn(searchColumn)?.getFilterValue() as string) ??
+                  ""
                 }
                 onChange={(event) =>
                   table
@@ -180,13 +179,16 @@ export function DataTable<TData, TValue>({
                   <TableHead
                     key={header.id}
                     className="bg-card/50"
-                    style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
+                    style={{
+                      width:
+                        header.getSize() !== 150 ? header.getSize() : undefined,
+                    }}
                   >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -214,7 +216,7 @@ export function DataTable<TData, TValue>({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -238,9 +240,7 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length > 0 && (
-            <span>
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            </span>
+            <span>{table.getFilteredSelectedRowModel().rows.length} of </span>
           )}
           {table.getFilteredRowModel().rows.length} row(s)
         </p>

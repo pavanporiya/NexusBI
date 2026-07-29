@@ -33,8 +33,14 @@ export default function RolesPage() {
         {
           id: "role_analyst",
           name: "Analyst",
-          description: "Execute SQL queries, create datasets, and build dashboards",
-          permissions: ["datasets:read", "datasets:create", "query:execute", "dashboards:create"],
+          description:
+            "Execute SQL queries, create datasets, and build dashboards",
+          permissions: [
+            "datasets:read",
+            "datasets:create",
+            "query:execute",
+            "dashboards:create",
+          ],
           is_system: false,
           created_at: new Date(Date.now() - 86400000 * 30).toISOString(),
           updated_at: new Date().toISOString(),
@@ -70,9 +76,13 @@ export default function RolesPage() {
           <div>
             <p className="font-medium text-foreground flex items-center gap-1.5">
               {row.original.name}
-              {row.original.is_system && <Badge variant="outline">System</Badge>}
+              {row.original.is_system && (
+                <Badge variant="outline">System</Badge>
+              )}
             </p>
-            <p className="text-2xs text-muted-foreground">{row.original.description}</p>
+            <p className="text-2xs text-muted-foreground">
+              {row.original.description}
+            </p>
           </div>
         </div>
       ),
@@ -82,7 +92,9 @@ export default function RolesPage() {
       header: "Permissions",
       cell: ({ row }) => (
         <Badge variant="secondary" className="font-mono text-2xs">
-          {row.original.permissions.includes("*") ? "All Permissions (*)" : `${row.original.permissions.length} Action String(s)`}
+          {row.original.permissions.includes("*")
+            ? "All Permissions (*)"
+            : `${row.original.permissions.length} Action String(s)`}
         </Badge>
       ),
     },
@@ -100,12 +112,19 @@ export default function RolesPage() {
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7" disabled={row.original.is_system}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              disabled={row.original.is_system}
+            >
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem><Edit className="mr-2 h-3.5 w-3.5" /> Edit Permissions</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Edit className="mr-2 h-3.5 w-3.5" /> Edit Permissions
+            </DropdownMenuItem>
             <DropdownMenuItem className="text-destructive focus:text-destructive">
               <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete Role
             </DropdownMenuItem>
@@ -119,8 +138,12 @@ export default function RolesPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Roles</h1>
-          <p className="text-xs text-muted-foreground">RBAC role definitions and permission mapping.</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Roles
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            RBAC role definitions and permission mapping.
+          </p>
         </div>
         <Button size="sm">
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Role

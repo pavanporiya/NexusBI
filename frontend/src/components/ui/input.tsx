@@ -18,17 +18,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             "disabled:cursor-not-allowed disabled:opacity-50",
             error && "border-destructive focus-visible:ring-destructive",
-            className
+            className,
           )}
           ref={ref}
           {...props}
         />
-        {error && (
-          <p className="mt-1 text-xs text-destructive">{error}</p>
-        )}
+        {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
       </div>
     );
-  }
+  },
 );
 Input.displayName = "Input";
 

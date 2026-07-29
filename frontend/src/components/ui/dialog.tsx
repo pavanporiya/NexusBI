@@ -19,7 +19,7 @@ const DialogOverlay = React.forwardRef<
     className={cn(
       "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm",
       "data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out",
-      className
+      className,
     )}
     {...props}
   />
@@ -39,7 +39,7 @@ const DialogContent = React.forwardRef<
         "border border-border bg-card shadow-2xl rounded-lg",
         "data-[state=open]:animate-scale-in",
         "duration-200",
-        className
+        className,
       )}
       {...props}
     >
@@ -71,7 +71,7 @@ const DialogFooter = ({
   <div
     className={cn(
       "flex items-center justify-end gap-2 border-t border-border p-4",
-      className
+      className,
     )}
     {...props}
   />
@@ -84,7 +84,10 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn("text-sm font-semibold leading-none tracking-tight", className)}
+    className={cn(
+      "text-sm font-semibold leading-none tracking-tight",
+      className,
+    )}
     {...props}
   />
 ));

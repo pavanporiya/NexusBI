@@ -55,9 +55,12 @@ export function TopBar() {
   const currentNav = allNavItems.find(
     (item) =>
       pathname === item.href ||
-      (item.href !== "/dashboard" && pathname.startsWith(item.href))
+      (item.href !== "/dashboard" && pathname.startsWith(item.href)),
   );
-  const pageTitle = currentNav?.title || breadcrumbs[breadcrumbs.length - 1]?.label || "Dashboard";
+  const pageTitle =
+    currentNav?.title ||
+    breadcrumbs[breadcrumbs.length - 1]?.label ||
+    "Dashboard";
 
   const handleLogout = () => {
     logout();
@@ -68,7 +71,7 @@ export function TopBar() {
     <header
       className={cn(
         "sticky top-0 z-30 flex h-12 shrink-0 items-center border-b border-border bg-background/80 backdrop-blur-sm transition-all duration-200",
-        sidebarCollapsed ? "pl-16" : "pl-60"
+        sidebarCollapsed ? "pl-16" : "pl-60",
       )}
     >
       <div className="flex flex-1 items-center justify-between px-4">
@@ -84,7 +87,7 @@ export function TopBar() {
                   "font-medium",
                   index === breadcrumbs.length - 1
                     ? "text-foreground"
-                    : "text-muted-foreground"
+                    : "text-muted-foreground",
                 )}
               >
                 {index === breadcrumbs.length - 1 ? pageTitle : crumb.label}
@@ -148,7 +151,10 @@ export function TopBar() {
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="text-destructive focus:text-destructive"
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 Log out
               </DropdownMenuItem>

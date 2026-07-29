@@ -32,7 +32,11 @@ export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [newReport, setNewReport] = useState({ name: "", dataset_id: "ds_sales_fact", description: "" });
+  const [newReport, setNewReport] = useState({
+    name: "",
+    dataset_id: "ds_sales_fact",
+    description: "",
+  });
 
   const fetchReports = async () => {
     setLoading(true);
@@ -87,7 +91,9 @@ export default function ReportsPage() {
           </div>
           <div>
             <p className="font-medium text-foreground">{row.original.name}</p>
-            <p className="text-2xs text-muted-foreground">{row.original.description || "No description"}</p>
+            <p className="text-2xs text-muted-foreground">
+              {row.original.description || "No description"}
+            </p>
           </div>
         </div>
       ),
@@ -120,7 +126,9 @@ export default function ReportsPage() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem><Edit className="mr-2 h-3.5 w-3.5" /> Edit Report Query</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Edit className="mr-2 h-3.5 w-3.5" /> Edit Report Query
+            </DropdownMenuItem>
             <DropdownMenuItem className="text-destructive focus:text-destructive">
               <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete Report
             </DropdownMenuItem>
@@ -134,8 +142,12 @@ export default function ReportsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Reports</h1>
-          <p className="text-xs text-muted-foreground">Tabular analytical reports and export documents.</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Reports
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Tabular analytical reports and export documents.
+          </p>
         </div>
         <Button size="sm" onClick={() => setIsCreateOpen(true)}>
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Report
@@ -155,7 +167,9 @@ export default function ReportsPage() {
           <form onSubmit={handleCreate}>
             <DialogHeader>
               <DialogTitle>Create Report</DialogTitle>
-              <DialogDescription>Define a new analytical report entity.</DialogDescription>
+              <DialogDescription>
+                Define a new analytical report entity.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-3 py-4">
               <div className="space-y-1">
@@ -164,7 +178,9 @@ export default function ReportsPage() {
                   placeholder="Monthly Executive Summary"
                   required
                   value={newReport.name}
-                  onChange={(e) => setNewReport({ ...newReport, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewReport({ ...newReport, name: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-1">
@@ -172,12 +188,18 @@ export default function ReportsPage() {
                 <Textarea
                   placeholder="Optional report description..."
                   value={newReport.description}
-                  onChange={(e) => setNewReport({ ...newReport, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewReport({ ...newReport, description: e.target.value })
+                  }
                 />
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreateOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">Create Report</Button>

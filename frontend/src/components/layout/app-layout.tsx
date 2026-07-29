@@ -21,22 +21,19 @@ export function AppLayout({ children }: AppLayoutProps) {
       <div
         className={cn(
           "flex flex-1 flex-col transition-all duration-200",
-          sidebarCollapsed ? "ml-16" : "ml-60"
+          sidebarCollapsed ? "ml-16" : "ml-60",
         )}
       >
         <TopBar />
         <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-[1440px] p-6">
-            {children}
-          </div>
+          <div className="mx-auto w-full max-w-[1440px] p-6">{children}</div>
         </main>
       </div>
       <CommandPalette />
       <Toaster
         position="bottom-right"
         toastOptions={{
-          className:
-            "border-border bg-card text-foreground text-sm",
+          className: "border-border bg-card text-foreground text-sm",
         }}
       />
     </div>

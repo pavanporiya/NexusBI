@@ -32,13 +32,19 @@ export default function WorkspacesPage() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [newWs, setNewWs] = useState({ name: "", slug: "", description: "", organization_id: "org_default" });
+  const [newWs, setNewWs] = useState({
+    name: "",
+    slug: "",
+    description: "",
+    organization_id: "org_default",
+  });
   const [submitting, setSubmitting] = useState(false);
 
   const fetchWorkspaces = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get<PaginatedResponse<Workspace>>("/workspaces");
+      const res =
+        await apiClient.get<PaginatedResponse<Workspace>>("/workspaces");
       setWorkspaces(res.items || []);
     } catch {
       // Mock data fallback
@@ -82,7 +88,12 @@ export default function WorkspacesPage() {
       await apiClient.post("/workspaces", newWs);
       toast.success("Workspace created");
       setIsCreateOpen(false);
-      setNewWs({ name: "", slug: "", description: "", organization_id: "org_default" });
+      setNewWs({
+        name: "",
+        slug: "",
+        description: "",
+        organization_id: "org_default",
+      });
       fetchWorkspaces();
     } catch {
       toast.error("Failed to create workspace");
@@ -113,9 +124,13 @@ export default function WorkspacesPage() {
           <div>
             <p className="font-medium text-foreground flex items-center gap-1.5">
               {row.original.name}
-              {row.original.is_default && <Badge variant="outline">Default</Badge>}
+              {row.original.is_default && (
+                <Badge variant="outline">Default</Badge>
+              )}
             </p>
-            <p className="font-mono text-2xs text-muted-foreground">{row.original.slug}</p>
+            <p className="font-mono text-2xs text-muted-foreground">
+              {row.original.slug}
+            </p>
           </div>
         </div>
       ),
@@ -176,8 +191,12 @@ export default function WorkspacesPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Workspaces</h1>
-          <p className="text-xs text-muted-foreground">Isolated analytics environments and team workspaces.</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Workspaces
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Isolated analytics environments and team workspaces.
+          </p>
         </div>
         <Button size="sm" onClick={() => setIsCreateOpen(true)}>
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Workspace
@@ -197,7 +216,9 @@ export default function WorkspacesPage() {
           <form onSubmit={handleCreate}>
             <DialogHeader>
               <DialogTitle>Create Workspace</DialogTitle>
-              <DialogDescription>Add a new workspace for dataset and query isolation.</DialogDescription>
+              <DialogDescription>
+                Add a new workspace for dataset and query isolation.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-3 py-4">
               <div className="space-y-1">
@@ -211,7 +232,9 @@ export default function WorkspacesPage() {
                     setNewWs({
                       ...newWs,
                       name: e.target.value,
-                      slug: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, "-"),
+                      slug: e.target.value
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]/g, "-"),
                     })
                   }
                 />
@@ -232,12 +255,18 @@ export default function WorkspacesPage() {
                   id="ws-desc"
                   placeholder="Optional workspace purpose..."
                   value={newWs.description}
-                  onChange={(e) => setNewWs({ ...newWs, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewWs({ ...newWs, description: e.target.value })
+                  }
                 />
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreateOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" loading={submitting}>

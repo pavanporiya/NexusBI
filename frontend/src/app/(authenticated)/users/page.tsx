@@ -65,11 +65,17 @@ export default function UsersPage() {
       cell: ({ row }) => (
         <div className="flex items-center gap-2.5">
           <Avatar className="h-7 w-7">
-            <AvatarFallback>{getInitials(row.original.full_name || row.original.email)}</AvatarFallback>
+            <AvatarFallback>
+              {getInitials(row.original.full_name || row.original.email)}
+            </AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-medium text-foreground">{row.original.full_name || row.original.email}</p>
-            <p className="text-2xs text-muted-foreground">{row.original.email}</p>
+            <p className="font-medium text-foreground">
+              {row.original.full_name || row.original.email}
+            </p>
+            <p className="text-2xs text-muted-foreground">
+              {row.original.email}
+            </p>
           </div>
         </div>
       ),
@@ -115,7 +121,9 @@ export default function UsersPage() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem><Edit className="mr-2 h-3.5 w-3.5" /> Modify User Roles</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Edit className="mr-2 h-3.5 w-3.5" /> Modify User Roles
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ),
@@ -126,8 +134,12 @@ export default function UsersPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Users</h1>
-          <p className="text-xs text-muted-foreground">User directory and RBAC role assignments.</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Users
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            User directory and RBAC role assignments.
+          </p>
         </div>
       </div>
 

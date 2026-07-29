@@ -16,7 +16,13 @@ import {
 } from "lucide-react";
 import { KpiCard } from "@/components/charts/kpi-card";
 import { StatusIndicator } from "@/components/charts/status-indicator";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiClient } from "@/lib/api-client";
@@ -64,7 +70,11 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={() => router.push("/sql-editor")}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => router.push("/sql-editor")}
+          >
             <Terminal className="mr-1.5 h-3.5 w-3.5" />
             New Query
           </Button>
@@ -131,14 +141,22 @@ export default function DashboardPage() {
                     <Database className="h-4 w-4 text-foreground" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-foreground">PostgreSQL Database</p>
-                    <p className="text-2xs text-muted-foreground">Metadata Store</p>
+                    <p className="text-xs font-medium text-foreground">
+                      PostgreSQL Database
+                    </p>
+                    <p className="text-2xs text-muted-foreground">
+                      Metadata Store
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <StatusIndicator status={postgresCheck?.status || "healthy"} />
+                  <StatusIndicator
+                    status={postgresCheck?.status || "healthy"}
+                  />
                   <p className="mt-0.5 font-mono text-2xs text-muted-foreground">
-                    {postgresCheck?.latency_ms ? `${postgresCheck.latency_ms} ms` : "1.2 ms"}
+                    {postgresCheck?.latency_ms
+                      ? `${postgresCheck.latency_ms} ms`
+                      : "1.2 ms"}
                   </p>
                 </div>
               </div>
@@ -149,14 +167,20 @@ export default function DashboardPage() {
                     <Zap className="h-4 w-4 text-foreground" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-foreground">Redis Cache</p>
-                    <p className="text-2xs text-muted-foreground">Semantic Query Cache</p>
+                    <p className="text-xs font-medium text-foreground">
+                      Redis Cache
+                    </p>
+                    <p className="text-2xs text-muted-foreground">
+                      Semantic Query Cache
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <StatusIndicator status={redisCheck?.status || "healthy"} />
                   <p className="mt-0.5 font-mono text-2xs text-muted-foreground">
-                    {redisCheck?.latency_ms ? `${redisCheck.latency_ms} ms` : "0.4 ms"}
+                    {redisCheck?.latency_ms
+                      ? `${redisCheck.latency_ms} ms`
+                      : "0.4 ms"}
                   </p>
                 </div>
               </div>
@@ -174,7 +198,9 @@ export default function DashboardPage() {
                 <Clock className="mx-auto h-4 w-4 text-muted-foreground mb-1" />
                 <p className="text-2xs text-muted-foreground">Uptime</p>
                 <p className="font-mono text-xs font-semibold text-foreground">
-                  {health?.uptime_seconds ? `${(health.uptime_seconds / 3600).toFixed(1)}h` : "99.98%"}
+                  {health?.uptime_seconds
+                    ? `${(health.uptime_seconds / 3600).toFixed(1)}h`
+                    : "99.98%"}
                 </p>
               </div>
               <div className="rounded-md border border-border p-3 text-center">
@@ -192,7 +218,9 @@ export default function DashboardPage() {
         <Card className="flex flex-col">
           <CardHeader className="pb-2">
             <CardTitle>Quick Access</CardTitle>
-            <CardDescription>Shortcuts to core platform features</CardDescription>
+            <CardDescription>
+              Shortcuts to core platform features
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex-1 space-y-2 pt-2">
             <Button
@@ -247,7 +275,9 @@ export default function DashboardPage() {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle>Recent Query Activity</CardTitle>
-          <CardDescription>Live execution feed across connected data sources</CardDescription>
+          <CardDescription>
+            Live execution feed across connected data sources
+          </CardDescription>
         </CardHeader>
         <CardContent className="pt-2">
           <div className="space-y-3">
@@ -255,7 +285,8 @@ export default function DashboardPage() {
               {
                 id: "q-1",
                 user: "sarah.chen@nexusbi.io",
-                query: "SELECT region, SUM(revenue) FROM sales_fact GROUP BY 1 ORDER BY 2 DESC LIMIT 10",
+                query:
+                  "SELECT region, SUM(revenue) FROM sales_fact GROUP BY 1 ORDER BY 2 DESC LIMIT 10",
                 duration: "142 ms",
                 rows: "10 rows",
                 status: "success",
@@ -264,7 +295,8 @@ export default function DashboardPage() {
               {
                 id: "q-2",
                 user: "alex.m@nexusbi.io",
-                query: "SELECT customer_id, COUNT(*) FROM orders WHERE created_at >= NOW() - INTERVAL '30 days' GROUP BY 1",
+                query:
+                  "SELECT customer_id, COUNT(*) FROM orders WHERE created_at >= NOW() - INTERVAL '30 days' GROUP BY 1",
                 duration: "854 ms",
                 rows: "4,291 rows",
                 status: "success",
@@ -273,7 +305,8 @@ export default function DashboardPage() {
               {
                 id: "q-3",
                 user: "system.copilot@nexusbi.io",
-                query: "EXPLAIN ANALYZE SELECT * FROM dim_products WHERE category = 'Enterprise'",
+                query:
+                  "EXPLAIN ANALYZE SELECT * FROM dim_products WHERE category = 'Enterprise'",
                 duration: "45 ms",
                 rows: "0 rows",
                 status: "success",
@@ -286,14 +319,20 @@ export default function DashboardPage() {
               >
                 <div className="flex-1 min-w-0 space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-foreground">{act.user}</span>
+                    <span className="font-medium text-foreground">
+                      {act.user}
+                    </span>
                     <span className="text-muted-foreground">•</span>
                     <span className="text-muted-foreground">{act.time}</span>
                   </div>
-                  <p className="font-mono text-2xs text-muted-foreground truncate">{act.query}</p>
+                  <p className="font-mono text-2xs text-muted-foreground truncate">
+                    {act.query}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="font-mono text-2xs text-muted-foreground">{act.duration}</span>
+                  <span className="font-mono text-2xs text-muted-foreground">
+                    {act.duration}
+                  </span>
                   <Badge variant="success">{act.rows}</Badge>
                 </div>
               </div>

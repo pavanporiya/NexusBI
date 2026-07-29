@@ -18,7 +18,7 @@ export class ApiClientError extends Error {
   constructor(
     public status: number,
     public errorCode: string,
-    public detail?: string
+    public detail?: string,
   ) {
     super(`[${errorCode}] ${detail || "API request failed"}`);
     this.name = "ApiClientError";
@@ -52,7 +52,7 @@ function getAuthHeaders(): Record<string, string> {
 
 function buildUrl(
   path: string,
-  params?: Record<string, string | number | boolean | undefined>
+  params?: Record<string, string | number | boolean | undefined>,
 ): string {
   const url = new URL(`${API_BASE_URL}${path}`);
   if (params) {
@@ -76,7 +76,7 @@ async function parseResponse<T>(response: Response): Promise<T> {
       throw new ApiClientError(
         response.status,
         `HTTP_${response.status}`,
-        response.statusText
+        response.statusText,
       );
     }
     return undefined as T;
@@ -89,7 +89,7 @@ async function parseResponse<T>(response: Response): Promise<T> {
     throw new ApiClientError(
       response.status,
       apiError.error_code || `HTTP_${response.status}`,
-      apiError.message || apiError.detail || "Request failed"
+      apiError.message || apiError.detail || "Request failed",
     );
   }
 
@@ -100,7 +100,7 @@ async function request<T>(
   method: HttpMethod,
   path: string,
   body?: unknown,
-  options?: RequestOptions
+  options?: RequestOptions,
 ): Promise<T> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",

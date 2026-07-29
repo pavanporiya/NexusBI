@@ -23,12 +23,15 @@ export function Sidebar() {
       <aside
         className={cn(
           "fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-border bg-card transition-all duration-200 ease-in-out",
-          sidebarCollapsed ? "w-16" : "w-60"
+          sidebarCollapsed ? "w-16" : "w-60",
         )}
       >
         {/* Brand */}
         <div className="flex h-12 shrink-0 items-center border-b border-border px-4">
-          <Link href="/dashboard" className="flex items-center gap-2.5 overflow-hidden">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2.5 overflow-hidden"
+          >
             <Hexagon className="h-5 w-5 shrink-0 text-primary" />
             {!sidebarCollapsed && (
               <span className="text-sm font-semibold tracking-tight text-foreground">
@@ -51,7 +54,8 @@ export function Sidebar() {
                 {group.items.map((item) => {
                   const isActive =
                     pathname === item.href ||
-                    (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                    (item.href !== "/dashboard" &&
+                      pathname.startsWith(item.href));
                   const Icon = item.icon;
 
                   const linkContent = (
@@ -62,7 +66,7 @@ export function Sidebar() {
                         isActive
                           ? "bg-primary/10 text-primary"
                           : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                        sidebarCollapsed && "justify-center px-0"
+                        sidebarCollapsed && "justify-center px-0",
                       )}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
@@ -97,7 +101,9 @@ export function Sidebar() {
           <button
             onClick={toggleSidebar}
             className="flex w-full items-center justify-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={
+              sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
+            }
           >
             {sidebarCollapsed ? (
               <PanelLeft className="h-4 w-4" />
