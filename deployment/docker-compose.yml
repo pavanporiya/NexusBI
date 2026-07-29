@@ -33,6 +33,17 @@ services:
       timeout: 5s
       retries: 5
 
+  migrations:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+    environment:
+      - POSTGRES_HOST=postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   backend:
     build:
       context: ../backend
@@ -47,6 +58,8 @@ services:
     ports:
       - "8000:8000"
     depends_on:
+      migrations:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
