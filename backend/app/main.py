@@ -231,6 +231,18 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         port=settings.PORT,
     )
 
+    # Perform RBAC Database Seeding
+    try:
+        from app.core.dependencies import _create_engine, _create_session_factory
+        from app.infrastructure.database.seed import seed_rbac
+
+        engine = _create_engine(settings)
+        session_factory = _create_session_factory(engine)
+        with session_factory() as session:
+            seed_rbac(session)
+    except Exception as exc:
+        logger.error("Failed to run automatic RBAC seed during startup", error=str(exc))
+
     yield
 
     logger.info("NexusBI API Service shutting down")
