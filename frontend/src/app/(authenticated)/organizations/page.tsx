@@ -2,8 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Building2, Plus, MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import {
+  Building2,
+  Plus,
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  AlertCircle,
+} from "lucide-react";
 import { DataTable } from "@/components/data-table/data-table";
+import { EmptyState } from "@/components/feedback/empty-state";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -31,38 +39,23 @@ import { toast } from "sonner";
 export default function OrganizationsPage() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newOrg, setNewOrg] = useState({ name: "", slug: "", description: "" });
   const [submitting, setSubmitting] = useState(false);
 
   const fetchOrganizations = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res =
         await apiClient.get<PaginatedResponse<Organization>>("/organizations");
       setOrganizations(res.items || []);
-    } catch {
-      // Fallback mock data if API unavailable
-      setOrganizations([
-        {
-          id: "org_1",
-          name: "Acme Corp Enterprise",
-          slug: "acme-corp",
-          description: "Global enterprise retail analytics organization",
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: "org_2",
-          name: "Nexus BI Core",
-          slug: "nexus-bi",
-          description: "Internal core organization",
-          is_active: true,
-          created_at: new Date(Date.now() - 86400000 * 30).toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ]);
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to load organizations";
+      setError(errorMessage);
+      setOrganizations([]);
     } finally {
       setLoading(false);
     }
@@ -184,13 +177,35 @@ export default function OrganizationsPage() {
         </Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={organizations}
-        isLoading={loading}
-        searchColumn="name"
-        searchPlaceholder="Filter organizations..."
-      />
+      {error ? (
+        <EmptyState
+          icon={AlertCircle}
+          title="Failed to load organizations"
+          description={error}
+          action={{
+            label: "Retry",
+            onClick: fetchOrganizations,
+          }}
+        />
+      ) : !loading && organizations.length === 0 ? (
+        <EmptyState
+          icon={Building2}
+          title="No organizations found"
+          description="Create your first organization to begin using NexusBI."
+          action={{
+            label: "Create Organization",
+            onClick: () => setIsCreateOpen(true),
+          }}
+        />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={organizations}
+          isLoading={loading}
+          searchColumn="name"
+          searchPlaceholder="Filter organizations..."
+        />
+      )}
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent>
