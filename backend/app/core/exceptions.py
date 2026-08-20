@@ -495,6 +495,28 @@ def register_exception_handlers(app: FastAPI) -> None:
     specific exception types are matched first.
     """
 
+    from app.domain.exceptions import DomainValidationError as _DomainVE
+
+    @app.exception_handler(_DomainVE)
+    async def domain_validation_error_handler(
+        request: Request, exc: _DomainVE
+    ) -> JSONResponse:
+        """Handle domain-level validation errors as 422 responses."""
+        request_id = getattr(request.state, "request_id", None) or get_correlation_id()
+        logger.warning(
+            "Domain validation error",
+            request_id=request_id,
+            path=request.url.path,
+            method=request.method,
+            detail=str(exc),
+        )
+        return _build_error_response(
+            status_code=422,
+            code="NBI-1001",
+            message="Domain validation failed",
+            detail=str(exc)[:200],
+        )
+
     @app.exception_handler(NexusBIError)
     async def nexusbi_error_handler(
         request: Request, exc: NexusBIError

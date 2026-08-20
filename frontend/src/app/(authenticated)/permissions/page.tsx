@@ -1,84 +1,76 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Lock } from "lucide-react";
+import { Lock, Loader2 } from "lucide-react";
 import { DataTable } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
+import { apiClient } from "@/lib/api-client";
 
 interface PermissionRule {
+  id: string;
   domain: string;
+  action: string;
+  description: string;
+  roles: string[];
+}
+
+interface RolePermission {
+  id: string;
+  resource: string;
   action: string;
   description: string;
 }
 
+interface Role {
+  id: string;
+  name: string;
+  permissions: RolePermission[];
+}
+
 export default function PermissionsPage() {
-  const [permissions] = useState<PermissionRule[]>([
-    {
-      domain: "Organizations",
-      action: "organizations:read",
-      description: "View organization lists and details",
-    },
-    {
-      domain: "Organizations",
-      action: "organizations:create",
-      description: "Create new enterprise organizations",
-    },
-    {
-      domain: "Organizations",
-      action: "organizations:update",
-      description: "Modify organization metadata",
-    },
-    {
-      domain: "Organizations",
-      action: "organizations:delete",
-      description: "Permanently delete an organization",
-    },
+  const [permissions, setPermissions] = useState<PermissionRule[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    {
-      domain: "Workspaces",
-      action: "workspaces:read",
-      description: "View workspace details and members",
-    },
-    {
-      domain: "Workspaces",
-      action: "workspaces:create",
-      description: "Create new analytical workspaces",
-    },
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      try {
+        setLoading(true);
+        const roles = await apiClient.get<Role[]>("/roles");
+        const permMap = new Map<
+          string,
+          { id: string; domain: string; action: string; description: string; roles: string[] }
+        >();
 
-    {
-      domain: "Datasets",
-      action: "datasets:read",
-      description: "Query datasets and preview sample rows",
-    },
-    {
-      domain: "Datasets",
-      action: "datasets:create",
-      description: "Register new physical tables or SQL queries",
-    },
+        for (const role of Array.isArray(roles) ? roles : []) {
+          for (const perm of role.permissions || []) {
+            const key = `${perm.resource}:${perm.action}`;
+            if (permMap.has(key)) {
+              permMap.get(key)!.roles.push(role.name);
+            } else {
+              permMap.set(key, {
+                id: perm.id,
+                domain: perm.resource,
+                action: `${perm.resource}:${perm.action}`,
+                description: perm.description,
+                roles: [role.name],
+              });
+            }
+          }
+        }
 
-    {
-      domain: "Query Engine",
-      action: "query:execute",
-      description: "Run interactive SELECT queries against DW",
-    },
-    {
-      domain: "Query Engine",
-      action: "query:explain",
-      description: "View query execution plan AST",
-    },
-
-    {
-      domain: "Dashboards",
-      action: "dashboards:create",
-      description: "Create and edit interactive dashboards",
-    },
-    {
-      domain: "Reports",
-      action: "reports:create",
-      description: "Generate analytical reports and exports",
-    },
-  ]);
+        setPermissions(Array.from(permMap.values()));
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : "Failed to load permissions";
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPermissions();
+  }, []);
 
   const columns: ColumnDef<PermissionRule>[] = [
     {
@@ -95,9 +87,9 @@ export default function PermissionsPage() {
     },
     {
       accessorKey: "domain",
-      header: "Domain Component",
+      header: "Domain",
       cell: ({ row }) => (
-        <span className="text-xs font-medium text-foreground">
+        <span className="text-xs font-medium text-foreground capitalize">
           {row.original.domain}
         </span>
       ),
@@ -111,6 +103,19 @@ export default function PermissionsPage() {
         </span>
       ),
     },
+    {
+      accessorKey: "roles",
+      header: "Assigned Roles",
+      cell: ({ row }) => (
+        <div className="flex flex-wrap gap-1">
+          {row.original.roles.map((r) => (
+            <Badge key={r} variant="secondary" className="text-2xs">
+              {r}
+            </Badge>
+          ))}
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -121,17 +126,32 @@ export default function PermissionsPage() {
             Permissions
           </h1>
           <p className="text-xs text-muted-foreground">
-            Fine-grained RBAC action strings enforced across all API endpoints.
+            Fine-grained RBAC permissions enforced across all API endpoints.
           </p>
         </div>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={permissions}
-        searchColumn="action"
-        searchPlaceholder="Filter permissions..."
-      />
+      {loading ? (
+        <div className="flex items-center justify-center py-12 text-muted-foreground">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Loading permissions…
+        </div>
+      ) : error ? (
+        <div className="text-center py-12 text-destructive text-sm">
+          {error}
+        </div>
+      ) : permissions.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground text-sm">
+          No permissions found.
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={permissions}
+          searchColumn="action"
+          searchPlaceholder="Filter permissions..."
+        />
+      )}
     </div>
   );
 }
