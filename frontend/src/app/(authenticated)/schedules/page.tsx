@@ -1,48 +1,71 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Clock, Plus, Play, Pause, Trash2 } from "lucide-react";
+import { Clock, Loader2, Play, Pause, Trash2 } from "lucide-react";
 import { DataTable } from "@/components/data-table/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { formatRelativeTime } from "@/lib/utils";
+import { apiClient } from "@/lib/api-client";
 
-interface ScheduleItem {
+interface Report {
   id: string;
   name: string;
-  target_report: string;
-  cron_expression: string;
-  recipient_email: string;
+  dataset_id: string;
+  report_type: string;
+  schedule: string | null;
   is_active: boolean;
-  last_run: string;
-  next_run: string;
+  created_at: string;
 }
 
 export default function SchedulesPage() {
-  const [schedules] = useState<ScheduleItem[]>([
-    {
-      id: "sch_1",
-      name: "Weekly Executive Revenue Digest",
-      target_report: "Q3 Enterprise Financial Summary",
-      cron_expression: "0 8 * * 1", // Every Monday at 8 AM
-      recipient_email: "exec-team@nexusbi.io",
-      is_active: true,
-      last_run: new Date(Date.now() - 86400000 * 2).toISOString(),
-      next_run: new Date(Date.now() + 86400000 * 5).toISOString(),
-    },
-    {
-      id: "sch_2",
-      name: "Daily Infrastructure Latency Alert",
-      target_report: "Infrastructure & API Latency Monitor",
-      cron_expression: "0 0 * * *", // Daily at Midnight
-      recipient_email: "devops@nexusbi.io",
-      is_active: true,
-      last_run: new Date(Date.now() - 3600000 * 12).toISOString(),
-      next_run: new Date(Date.now() + 3600000 * 12).toISOString(),
-    },
-  ]);
+  const [schedules, setSchedules] = useState<Report[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const columns: ColumnDef<ScheduleItem>[] = [
+  const fetchSchedules = async () => {
+    try {
+      setLoading(true);
+      const data = await apiClient.get<{ items: Report[] }>("/reports?limit=100");
+      const items = data?.items || (Array.isArray(data) ? data : []);
+      // Show only reports that have a schedule configured
+      setSchedules(items.filter((r) => r.schedule && r.schedule.trim() !== ""));
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Failed to load schedules";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSchedules();
+  }, []);
+
+  const handleToggleActive = async (report: Report) => {
+    try {
+      await apiClient.patch(`/reports/${report.id}`, {
+        is_active: !report.is_active,
+      });
+      fetchSchedules();
+    } catch {
+      // Silently fail — UI stays unchanged
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this schedule?")) return;
+    try {
+      await apiClient.delete(`/reports/${id}`);
+      fetchSchedules();
+    } catch {
+      // Silently fail
+    }
+  };
+
+  const columns: ColumnDef<Report>[] = [
     {
       accessorKey: "name",
       header: "Schedule Name",
@@ -54,28 +77,28 @@ export default function SchedulesPage() {
           <div>
             <p className="font-medium text-foreground">{row.original.name}</p>
             <p className="text-2xs text-muted-foreground">
-              {row.original.target_report}
+              {row.original.report_type} report
             </p>
           </div>
         </div>
       ),
     },
     {
-      accessorKey: "cron_expression",
+      accessorKey: "schedule",
       header: "Cron Cadence",
       cell: ({ row }) => (
         <Badge variant="outline" className="font-mono text-2xs">
-          {row.original.cron_expression}
+          {row.original.schedule || "—"}
         </Badge>
       ),
     },
     {
-      accessorKey: "recipient_email",
-      header: "Recipient",
+      accessorKey: "report_type",
+      header: "Type",
       cell: ({ row }) => (
-        <span className="text-xs text-muted-foreground">
-          {row.original.recipient_email}
-        </span>
+        <Badge variant="secondary" className="text-2xs">
+          {row.original.report_type}
+        </Badge>
       ),
     },
     {
@@ -88,10 +111,24 @@ export default function SchedulesPage() {
       ),
     },
     {
+      accessorKey: "created_at",
+      header: "Created",
+      cell: ({ row }) => (
+        <span className="text-xs text-muted-foreground">
+          {formatRelativeTime(row.original.created_at)}
+        </span>
+      ),
+    },
+    {
       id: "actions",
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
-          <Button variant="ghost" size="icon" className="h-7 w-7">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            onClick={() => handleToggleActive(row.original)}
+          >
             {row.original.is_active ? (
               <Pause className="h-3.5 w-3.5" />
             ) : (
@@ -102,6 +139,7 @@ export default function SchedulesPage() {
             variant="ghost"
             size="icon"
             className="h-7 w-7 text-destructive"
+            onClick={() => handleDelete(row.original.id)}
           >
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
@@ -118,20 +156,30 @@ export default function SchedulesPage() {
             Schedules
           </h1>
           <p className="text-xs text-muted-foreground">
-            Automated report dispatch timers and email subscription cron tasks.
+            Automated report dispatch timers. Configure schedules on the Reports page.
           </p>
         </div>
-        <Button size="sm">
-          <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Schedule
-        </Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={schedules}
-        searchColumn="name"
-        searchPlaceholder="Filter schedules..."
-      />
+      {loading ? (
+        <div className="flex items-center justify-center py-12 text-muted-foreground">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Loading schedules…
+        </div>
+      ) : error ? (
+        <div className="text-center py-12 text-destructive text-sm">{error}</div>
+      ) : schedules.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground text-sm">
+          No scheduled reports yet. Create a report with a schedule to see it here.
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={schedules}
+          searchColumn="name"
+          searchPlaceholder="Filter schedules..."
+        />
+      )}
     </div>
   );
 }
