@@ -176,4 +176,3 @@ def test_execute_agent_query_personas_execution() -> None:
     # VisualizationService.select_chart_type returns 'table' for single-column results
     assert run.visualization_config.get("type") in ("bar", "table")
     assert run.status.value == "completed"
-

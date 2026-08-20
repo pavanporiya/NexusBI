@@ -44,9 +44,7 @@ class ChartSpec(BaseModel):
     series: list[dict[str, Any]] | None = Field(
         default=None, description="Chart series data array."
     )
-    labels: list[str] | None = Field(
-        default=None, description="Category axis labels."
-    )
+    labels: list[str] | None = Field(default=None, description="Category axis labels.")
     metadata: dict[str, Any] = Field(
         default_factory=dict, description="Additional visualization metadata."
     )

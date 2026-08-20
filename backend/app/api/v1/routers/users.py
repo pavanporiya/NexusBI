@@ -39,9 +39,7 @@ router = APIRouter(prefix="/users", tags=["User Management"])
     dependencies=[Depends(require_permission("users:read"))],
 )
 def list_users(
-    use_case: Annotated[
-        ListUsersUseCase, Depends(get_list_users_use_case)
-    ],
+    use_case: Annotated[ListUsersUseCase, Depends(get_list_users_use_case)],
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
     offset: Annotated[int, Query(ge=0)] = 0,
 ) -> list[UserDTO]:
@@ -97,9 +95,7 @@ def get_me(
 )
 def get_user_by_id(
     user_id: str,
-    use_case: Annotated[
-        GetUserUseCase, Depends(get_get_user_use_case)
-    ],
+    use_case: Annotated[GetUserUseCase, Depends(get_get_user_use_case)],
 ) -> UserDTO:
     """Retrieve details for a specific user by identifier."""
     return use_case.execute(user_id)
@@ -122,9 +118,7 @@ def get_user_by_id(
 def update_user(
     user_id: str,
     dto: UpdateUserDTO,
-    use_case: Annotated[
-        UpdateUserUseCase, Depends(get_update_user_use_case)
-    ],
+    use_case: Annotated[UpdateUserUseCase, Depends(get_update_user_use_case)],
 ) -> UserDTO:
     """Update editable profile fields for a specific user."""
     return use_case.execute(user_id, dto)

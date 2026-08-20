@@ -249,13 +249,10 @@ class VisualizationService:
 
         domain_chart_type = ChartType.from_str(norm_type)
 
-        first_y = (
-            y_axis_cols
-            or (
-                [query_result.columns[1].name]
-                if len(query_result.columns) > 1
-                else [query_result.columns[0].name]
-            )
+        first_y = y_axis_cols or (
+            [query_result.columns[1].name]
+            if len(query_result.columns) > 1
+            else [query_result.columns[0].name]
         )
 
         config = ChartConfiguration(

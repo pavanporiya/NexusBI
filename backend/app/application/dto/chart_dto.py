@@ -175,4 +175,3 @@ class ChartSpecDTO(BaseModel):
     )
     labels: list[str] | None = Field(default=None, description="Category labels")
     metadata: dict[str, Any] = Field(default_factory=dict, description="Chart metadata")
-

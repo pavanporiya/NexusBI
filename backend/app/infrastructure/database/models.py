@@ -634,4 +634,3 @@ class AgentRunModel(Base):
             f"AgentRunModel(id={self.id!r}, user_id={self.user_id!r}, "
             f"status={self.status!r})"
         )
-

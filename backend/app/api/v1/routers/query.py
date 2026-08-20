@@ -72,10 +72,7 @@ def _map_metadata_to_dto(meta: QueryMetadata) -> QueryMetadataDTO:
         ),
         execution_time=meta.execution_time,
         row_count=meta.row_count,
-        columns=[
-            QueryColumnDTO(name=c.name, type=c.type)
-            for c in meta.columns
-        ],
+        columns=[QueryColumnDTO(name=c.name, type=c.type) for c in meta.columns],
         truncated=meta.truncated,
         limit=meta.limit,
         offset=meta.offset,
@@ -84,10 +81,18 @@ def _map_metadata_to_dto(meta: QueryMetadata) -> QueryMetadataDTO:
 
 # ── Endpoints ──────────────────────────────────────────────────────────────
 
-_SENSITIVE_COLUMNS = frozenset({
-    "hashed_password", "password_hash", "secret", "token",
-    "api_key", "private_key", "credential", "ssn",
-})
+_SENSITIVE_COLUMNS = frozenset(
+    {
+        "hashed_password",
+        "password_hash",
+        "secret",
+        "token",
+        "api_key",
+        "private_key",
+        "credential",
+        "ssn",
+    }
+)
 
 
 @router.post(
@@ -106,12 +111,8 @@ _SENSITIVE_COLUMNS = frozenset({
 )
 def validate_query(
     dto: ValidateQueryRequestDTO,
-    _current_user: Annotated[
-        User, Depends(get_current_user)
-    ] = None,  # type: ignore[assignment]
-    query_service: Annotated[
-        QueryService, Depends(get_query_service)
-    ] = None,  # type: ignore[assignment]
+    _current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
+    query_service: Annotated[QueryService, Depends(get_query_service)] = None,  # type: ignore[assignment]
 ) -> ValidateQueryResponseDTO:
     """Validate a SQL query for safety and syntax correctness."""
     request_vo = QueryRequest.create(sql=dto.sql, parameters=dto.parameters)
@@ -138,12 +139,8 @@ def validate_query(
 )
 def execute_query(
     dto: ExecuteQueryRequestDTO,
-    _current_user: Annotated[
-        User, Depends(get_current_user)
-    ] = None,  # type: ignore[assignment]
-    query_service: Annotated[
-        QueryService, Depends(get_query_service)
-    ] = None,  # type: ignore[assignment]
+    _current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
+    query_service: Annotated[QueryService, Depends(get_query_service)] = None,  # type: ignore[assignment]
 ) -> QueryResultDTO:
     """Execute a validated read-only SQL query."""
     request_vo = QueryRequest.create(
@@ -171,12 +168,8 @@ def execute_query(
 )
 def explain_query(
     dto: ExplainQueryRequestDTO,
-    _current_user: Annotated[
-        User, Depends(get_current_user)
-    ] = None,  # type: ignore[assignment]
-    query_service: Annotated[
-        QueryService, Depends(get_query_service)
-    ] = None,  # type: ignore[assignment]
+    _current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
+    query_service: Annotated[QueryService, Depends(get_query_service)] = None,  # type: ignore[assignment]
 ) -> QueryMetadataDTO:
     """Explain a SQL query plan."""
     request_vo = QueryRequest.create(sql=dto.sql, parameters=dto.parameters)
@@ -199,12 +192,8 @@ def preview_dataset(
     dataset_id: str,
     limit: Annotated[int, Query(ge=1, le=500)] = 10,
     offset: Annotated[int, Query(ge=0)] = 0,
-    _current_user: Annotated[
-        User, Depends(get_current_user)
-    ] = None,  # type: ignore[assignment]
-    query_service: Annotated[
-        QueryService, Depends(get_query_service)
-    ] = None,  # type: ignore[assignment]
+    _current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
+    query_service: Annotated[QueryService, Depends(get_query_service)] = None,  # type: ignore[assignment]
 ) -> QueryResultDTO:
     """Preview dataset sample rows with sensitive columns filtered."""
     result_vo = query_service.preview_dataset(
@@ -214,14 +203,13 @@ def preview_dataset(
     )
     # Filter sensitive columns from preview results
     filtered_columns = [
-        c for c in result_vo.columns
-        if (c.name if hasattr(c, "name") else str(c)).lower()
-        not in _SENSITIVE_COLUMNS
+        c
+        for c in result_vo.columns
+        if (c.name if hasattr(c, "name") else str(c)).lower() not in _SENSITIVE_COLUMNS
     ]
     if len(filtered_columns) < len(result_vo.columns):
         filtered_names = {
-            c.name if hasattr(c, "name") else str(c)
-            for c in filtered_columns
+            c.name if hasattr(c, "name") else str(c) for c in filtered_columns
         }
         filtered_rows = [
             {k: v for k, v in row.items() if k in filtered_names}

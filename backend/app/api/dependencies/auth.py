@@ -817,9 +817,7 @@ def get_llm_provider_service() -> LLMProviderService:
 def get_agent_tool_registry(
     query_service: Annotated[QueryService, Depends(get_query_service)],
     dataset_repo: Annotated[IDatasetRepository, Depends(get_dataset_repository)],
-    auth_service: Annotated[
-        IAuthorizationService, Depends(get_authorization_service)
-    ],
+    auth_service: Annotated[IAuthorizationService, Depends(get_authorization_service)],
     list_orgs_use_case: Annotated[
         ListOrganizationsUseCase, Depends(get_list_organizations_use_case)
     ],
@@ -839,15 +837,9 @@ def get_execute_agent_query_use_case(
     llm_service: Annotated[LLMProviderService, Depends(get_llm_provider_service)],
     query_service: Annotated[QueryService, Depends(get_query_service)],
     dataset_repo: Annotated[IDatasetRepository, Depends(get_dataset_repository)],
-    agent_run_repo: Annotated[
-        IAgentRunRepository, Depends(get_agent_run_repository)
-    ],
-    auth_service: Annotated[
-        IAuthorizationService, Depends(get_authorization_service)
-    ],
-    tool_registry: Annotated[
-        AgentToolRegistry, Depends(get_agent_tool_registry)
-    ],
+    agent_run_repo: Annotated[IAgentRunRepository, Depends(get_agent_run_repository)],
+    auth_service: Annotated[IAuthorizationService, Depends(get_authorization_service)],
+    tool_registry: Annotated[AgentToolRegistry, Depends(get_agent_tool_registry)],
 ) -> ExecuteAgentQueryUseCase:
     """Dependency provider for ExecuteAgentQueryUseCase."""
     from app.application.use_cases.execute_agent_query import (
@@ -867,9 +859,7 @@ def get_execute_agent_query_use_case(
 
 
 def get_get_agent_run_use_case(
-    agent_run_repo: Annotated[
-        IAgentRunRepository, Depends(get_agent_run_repository)
-    ],
+    agent_run_repo: Annotated[IAgentRunRepository, Depends(get_agent_run_repository)],
 ) -> GetAgentRunUseCase:
     """Dependency provider for GetAgentRunUseCase."""
     from app.application.use_cases.get_agent_run import GetAgentRunUseCase
@@ -878,9 +868,7 @@ def get_get_agent_run_use_case(
 
 
 def get_list_agent_runs_use_case(
-    agent_run_repo: Annotated[
-        IAgentRunRepository, Depends(get_agent_run_repository)
-    ],
+    agent_run_repo: Annotated[IAgentRunRepository, Depends(get_agent_run_repository)],
 ) -> ListAgentRunsUseCase:
     """Dependency provider for ListAgentRunsUseCase."""
     from app.application.use_cases.get_agent_run import ListAgentRunsUseCase
@@ -895,5 +883,3 @@ def get_visualization_service(
     from app.application.services.visualization_service import VisualizationService
 
     return VisualizationService(chart_service=chart_service)
-
-

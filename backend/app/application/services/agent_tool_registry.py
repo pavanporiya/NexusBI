@@ -143,9 +143,9 @@ class AgentToolRegistry:
             ]
 
         items_data = [
-            item.model_dump() if hasattr(item, "model_dump") else (
-                item.__dict__ if hasattr(item, "__dict__") else item
-            )
+            item.model_dump()
+            if hasattr(item, "model_dump")
+            else (item.__dict__ if hasattr(item, "__dict__") else item)
             for item in items
         ]
 
@@ -283,8 +283,7 @@ class AgentToolRegistry:
             raise AuthorizationError(
                 message="Permission denied",
                 detail=(
-                    "User lacks datasets:read permission required for "
-                    "execute_sql tool"
+                    "User lacks datasets:read permission required for execute_sql tool"
                 ),
             )
 
@@ -329,10 +328,7 @@ class AgentToolRegistry:
         return {
             "tool": "execute_sql",
             "rows": res.rows,
-            "columns": [
-                c.name if hasattr(c, "name") else str(c)
-                for c in res.columns
-            ],
+            "columns": [c.name if hasattr(c, "name") else str(c) for c in res.columns],
             "column_types": res.column_types,
             "row_count": res.row_count,
             "execution_time_ms": res.execution_time * 1000,
@@ -365,4 +361,3 @@ class AgentToolRegistry:
             return self._dataset_repo.get_by_id(dataset_id)
 
         return resolver
-

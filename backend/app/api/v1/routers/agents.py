@@ -141,8 +141,7 @@ def list_agent_personas() -> list[AgentPersonaSummaryDTO]:
     response_description="Agent execution results with generated SQL and trace steps.",
     responses=create_error_responses(400, 401, 403, 404, 500, 504),
     description=(
-        "Translates natural language to SQL and executes it via "
-        "the agent pipeline."
+        "Translates natural language to SQL and executes it via the agent pipeline."
     ),
     dependencies=[Depends(require_permission("agents:execute"))],
 )
@@ -217,4 +216,3 @@ def list_agent_runs(
         )
         for r in runs
     ]
-

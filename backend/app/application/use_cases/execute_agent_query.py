@@ -264,9 +264,11 @@ class ExecuteAgentQueryUseCase:
         is_analytical_org = is_org_keyword and any(
             m in query_lower for m in _ANALYTICAL_MARKERS
         )
-        is_simple_org_lookup = is_org_keyword and any(
-            m in query_lower for m in _LOOKUP_MARKERS
-        ) and not is_analytical_org
+        is_simple_org_lookup = (
+            is_org_keyword
+            and any(m in query_lower for m in _LOOKUP_MARKERS)
+            and not is_analytical_org
+        )
 
         # Simple org lookups go through deterministic tool shortcut
         if is_simple_org_lookup:
@@ -494,9 +496,8 @@ class ExecuteAgentQueryUseCase:
 
             # If no column metadata, create a minimal context
             if not columns:
-                table_name = (
-                    getattr(dataset, "object_name", None)
-                    or getattr(dataset, "name", "unknown_table")
+                table_name = getattr(dataset, "object_name", None) or getattr(
+                    dataset, "name", "unknown_table"
                 )
                 schema_context = (
                     f'Table: "{table_name}"\n'
@@ -647,8 +648,7 @@ class ExecuteAgentQueryUseCase:
             run.query_result = {
                 "rows": result.rows,
                 "columns": [
-                    c.name if hasattr(c, "name") else str(c)
-                    for c in result.columns
+                    c.name if hasattr(c, "name") else str(c) for c in result.columns
                 ],
                 "column_types": result.column_types,
                 "row_count": result.row_count,
@@ -837,4 +837,3 @@ class ExecuteAgentQueryUseCase:
             step.error = _sanitize_error_message(str(exc))
             run.add_step(step)
             logger.warning(f"Persona execution {agent_role} step warning: {exc}")
-

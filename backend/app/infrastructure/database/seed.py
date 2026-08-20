@@ -320,8 +320,7 @@ DEFAULT_ROLES: list[dict[str, Any]] = [
     {
         "name": "Viewer",
         "description": (
-            "Read-only access to system dashboards, reports, datasets, and"
-            " workspaces."
+            "Read-only access to system dashboards, reports, datasets, and workspaces."
         ),
         "permissions": VIEWER_PERMISSION_PAIRS,
     },
@@ -406,10 +405,9 @@ def seed_rbac(session: Session, reset_dev_admin_password: bool = False) -> None:
     dev_password = "SecureP@ssw0rd!"
     hasher = BcryptPasswordHasher()
 
-    should_reset = (
-        reset_dev_admin_password
-        or os.getenv("RESET_DEV_ADMIN_PASSWORD", "false").lower() in ("true", "1")
-    )
+    should_reset = reset_dev_admin_password or os.getenv(
+        "RESET_DEV_ADMIN_PASSWORD", "false"
+    ).lower() in ("true", "1")
 
     admin_user = (
         session.execute(select(UserModel).where(UserModel.email == admin_email))
@@ -438,9 +436,7 @@ def seed_rbac(session: Session, reset_dev_admin_password: bool = False) -> None:
             needs_hash_update = True
         else:
             try:
-                if not hasher.verify_password(
-                    dev_password, admin_user.hashed_password
-                ):
+                if not hasher.verify_password(dev_password, admin_user.hashed_password):
                     needs_hash_update = True
             except Exception:
                 needs_hash_update = True

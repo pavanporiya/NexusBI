@@ -161,4 +161,3 @@ SQL: {generated_sql}
 Data Insights: {data_insights}
 Visualization Recommendation: {visualization_summary}
 """
-

@@ -344,4 +344,3 @@ class AuditLogger:
             total_cost_usd=round(total_cost_usd, 4),
             error=error,
         )
-

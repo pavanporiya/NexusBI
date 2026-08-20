@@ -62,9 +62,7 @@ def test_authorized_dataset_query_pass(mock_user: User) -> None:
     dataset_repo.get_by_id.return_value = ds
     dataset_repo.list.return_value = ([ds], 1)
 
-    sql_resp = (
-        "SELECT month, SUM(amount) AS total_sales FROM sales GROUP BY month"
-    )
+    sql_resp = "SELECT month, SUM(amount) AS total_sales FROM sales GROUP BY month"
     llm_service.complete.side_effect = [
         LLMResponse(
             content=sql_resp,

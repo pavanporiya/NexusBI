@@ -54,9 +54,7 @@ class TestMockProvider:
 
     def test_zero_tokens_and_cost(self) -> None:
         provider = MockProvider()
-        response = provider.complete(
-            system_prompt="", user_message=""
-        )
+        response = provider.complete(system_prompt="", user_message="")
         assert response.total_tokens == 20
         assert response.cost_usd == 0.0
 
@@ -145,9 +143,7 @@ class TestOllamaProvider:
             mock_client.post.return_value = mock_response
             mock_client_cls.return_value = mock_client
 
-            response = provider.complete(
-                system_prompt="test", user_message="test"
-            )
+            response = provider.complete(system_prompt="test", user_message="test")
 
         assert response.model == "mistral"
 
@@ -199,9 +195,7 @@ class TestOllamaProvider:
             mock_client.post.side_effect = [error_response, success_response]
             mock_client_cls.return_value = mock_client
 
-            response = provider.complete(
-                system_prompt="test", user_message="test"
-            )
+            response = provider.complete(system_prompt="test", user_message="test")
 
         assert response.content == "SELECT 1;"
 
@@ -218,9 +212,7 @@ class TestOllamaProvider:
             mock_client_cls.return_value = mock_client
 
             with pytest.raises(AITimeoutError):
-                provider.complete(
-                    system_prompt="test", user_message="test"
-                )
+                provider.complete(system_prompt="test", user_message="test")
 
     def test_connection_error_raises_ai_provider_error(self) -> None:
         import httpx
@@ -235,9 +227,7 @@ class TestOllamaProvider:
             mock_client_cls.return_value = mock_client
 
             with pytest.raises(AIProviderError, match="transport"):
-                provider.complete(
-                    system_prompt="test", user_message="test"
-                )
+                provider.complete(system_prompt="test", user_message="test")
 
     def test_client_error_raises_ai_provider_error(self) -> None:
         provider = OllamaProvider()
@@ -254,9 +244,7 @@ class TestOllamaProvider:
             mock_client_cls.return_value = mock_client
 
             with pytest.raises(AIProviderError, match="400"):
-                provider.complete(
-                    system_prompt="test", user_message="test"
-                )
+                provider.complete(system_prompt="test", user_message="test")
 
     def test_metadata_captured(self) -> None:
         provider = OllamaProvider()
@@ -280,9 +268,7 @@ class TestOllamaProvider:
             mock_client.post.return_value = mock_response
             mock_client_cls.return_value = mock_client
 
-            response = provider.complete(
-                system_prompt="test", user_message="test"
-            )
+            response = provider.complete(system_prompt="test", user_message="test")
 
         assert response.metadata["total_duration_ns"] == 999999
         assert response.metadata["eval_duration_ns"] == 333333

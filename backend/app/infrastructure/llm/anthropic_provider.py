@@ -180,9 +180,7 @@ class AnthropicProvider(ILLMProvider):
             message="Anthropic API failed after retries",
         )
 
-    def _parse_response(
-        self, data: dict[str, Any], model: str
-    ) -> LLMResponse:
+    def _parse_response(self, data: dict[str, Any], model: str) -> LLMResponse:
         """Parse the Anthropic Messages API response into LLMResponse."""
         # Extract text from content blocks
         content_blocks = data.get("content", [])
