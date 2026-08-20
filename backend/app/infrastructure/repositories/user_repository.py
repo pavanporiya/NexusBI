@@ -122,6 +122,26 @@ class SQLAlchemyUserRepository:
         self._session.flush()
         return True
 
+    def list_all(self, limit: int = 50, offset: int = 0) -> list[User]:
+        """Fetch a paginated list of all users."""
+        from sqlalchemy import select
+
+        stmt = (
+            select(UserModel)
+            .order_by(UserModel.created_at.desc())
+            .offset(offset)
+            .limit(limit)
+        )
+        models = list(self._session.execute(stmt).scalars().all())
+        return [UserMapper.to_domain(m) for m in models]
+
+    def count_all(self) -> int:
+        """Count total users."""
+        from sqlalchemy import func, select
+
+        count_q = select(func.count()).select_from(UserModel)
+        return self._session.execute(count_q).scalar() or 0
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------

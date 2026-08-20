@@ -33,3 +33,7 @@ class IUserRepository(Protocol):
     def delete(self, user_id: str) -> bool:
         """Permanently remove a User from persistence."""
         ...
+
+    def list_all(self, limit: int = 50, offset: int = 0) -> list[User]:
+        """Fetch a paginated list of all users."""
+        ...

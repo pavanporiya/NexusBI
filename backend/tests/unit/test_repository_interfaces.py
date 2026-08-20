@@ -42,6 +42,9 @@ class _StubUserRepository:
     def delete(self, _user_id: str) -> bool:
         return True
 
+    def list_all(self, limit: int = 50, offset: int = 0) -> list[User]:
+        return []
+
 
 class _StubSessionRepository(ISessionRepo):
     """Minimal conforming implementation of ISessionRepository."""

@@ -76,6 +76,7 @@ from app.application.use_cases.get_agent_run import (
     GetAgentRunUseCase,
     ListAgentRunsUseCase,
 )
+from app.application.use_cases.list_users import ListUsersUseCase
 from app.core.config import get_settings
 from app.core.dependencies import get_db
 from app.core.exceptions import AuthenticationError
@@ -247,6 +248,13 @@ def get_update_user_use_case(
 ) -> UpdateUserUseCase:
     """Dependency provider for UpdateUserUseCase."""
     return UpdateUserUseCase(user_repository=user_repo)
+
+
+def get_list_users_use_case(
+    user_repo: Annotated[IUserRepository, Depends(get_user_repository)],
+) -> ListUsersUseCase:
+    """Dependency provider for ListUsersUseCase."""
+    return ListUsersUseCase(user_repository=user_repo)
 
 
 def get_get_roles_use_case(

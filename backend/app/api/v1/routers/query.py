@@ -1,16 +1,21 @@
-"""Query Engine REST API endpoints (v1 namespace)."""
+"""Query Engine REST API endpoints (v1 namespace).
+
+Provides HTTP handlers for SQL query validation, execution, explanation,
+and dataset preview functionality backed by the universal query service.
+"""
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, status
 
-from app.api.dependencies import (
+from app.api.dependencies.auth import (
     get_current_user,
     get_query_service,
-    require_permission,
 )
+from app.api.dependencies.authorization import require_permission
 from app.application.dto.error_dto import create_error_responses
 from app.application.dto.query_dto import (
     ExecuteQueryRequestDTO,
@@ -29,8 +34,35 @@ from app.domain.value_objects.query import QueryMetadata, QueryRequest, QueryRes
 router = APIRouter(prefix="/query", tags=["Universal Query Engine"])
 
 
+# ── Helpers ────────────────────────────────────────────────────────────────
+
+
+def _map_result_to_dto(result: QueryResult) -> QueryResultDTO:
+    """Map a QueryResult value object to its API response DTO."""
+    columns = [
+        QueryColumnDTO(
+            name=c.name if hasattr(c, "name") else str(c),
+            type=c.type if hasattr(c, "type") else "unknown",
+        )
+        for c in result.columns
+    ]
+    return QueryResultDTO(
+        rows=result.rows,
+        columns=columns,
+        column_types=result.column_types,
+        execution_time=result.execution_time,
+        row_count=result.row_count,
+        metadata=QueryMetadataDTO(
+            statistics=QueryStatisticsDTO(),
+            execution_time=result.execution_time,
+            row_count=result.row_count,
+            columns=columns,
+        ),
+    )
+
+
 def _map_metadata_to_dto(meta: QueryMetadata) -> QueryMetadataDTO:
-    """Map domain QueryMetadata value object to QueryMetadataDTO."""
+    """Map QueryMetadata to its API response DTO."""
     return QueryMetadataDTO(
         statistics=QueryStatisticsDTO(
             query_plan=meta.statistics.query_plan,
@@ -40,42 +72,48 @@ def _map_metadata_to_dto(meta: QueryMetadata) -> QueryMetadataDTO:
         ),
         execution_time=meta.execution_time,
         row_count=meta.row_count,
-        columns=[QueryColumnDTO(name=c.name, type=c.type) for c in meta.columns],
+        columns=[
+            QueryColumnDTO(name=c.name, type=c.type)
+            for c in meta.columns
+        ],
         truncated=meta.truncated,
         limit=meta.limit,
         offset=meta.offset,
     )
 
 
-def _map_result_to_dto(result: QueryResult) -> QueryResultDTO:
-    """Map domain QueryResult value object to QueryResultDTO."""
-    return QueryResultDTO(
-        rows=result.rows,
-        columns=[QueryColumnDTO(name=c.name, type=c.type) for c in result.columns],
-        column_types=result.column_types,
-        execution_time=result.execution_time,
-        row_count=result.row_count,
-        metadata=_map_metadata_to_dto(result.metadata),
-    )
+# ── Endpoints ──────────────────────────────────────────────────────────────
+
+_SENSITIVE_COLUMNS = frozenset({
+    "hashed_password", "password_hash", "secret", "token",
+    "api_key", "private_key", "credential", "ssn",
+})
 
 
 @router.post(
     "/validate",
     response_model=ValidateQueryResponseDTO,
     status_code=status.HTTP_200_OK,
-    summary="Validate SQL Query",
+    summary="Validate SQL Query Safety",
     operation_id="query_validate",
-    response_description="Validation status confirmation.",
-    responses=create_error_responses(400, 401, 403, 422, 500),
-    description="Validates SQL query against AST security rules.",
-    dependencies=[Depends(require_permission("datasets:read"))],
+    response_description="Validation result with status and message.",
+    responses=create_error_responses(400, 401, 403, 500),
+    description=(
+        "Validates a raw SQL query string for safety, syntax correctness, "
+        "and read-only restrictions. Does NOT execute the query."
+    ),
+    dependencies=[Depends(require_permission("query:execute"))],
 )
 def validate_query(
     dto: ValidateQueryRequestDTO,
-    _current_user: Annotated[User, Depends(get_current_user)],
-    query_service: Annotated[QueryService, Depends(get_query_service)],
+    _current_user: Annotated[
+        User, Depends(get_current_user)
+    ] = None,  # type: ignore[assignment]
+    query_service: Annotated[
+        QueryService, Depends(get_query_service)
+    ] = None,  # type: ignore[assignment]
 ) -> ValidateQueryResponseDTO:
-    """Validate a SQL query without executing it."""
+    """Validate a SQL query for safety and syntax correctness."""
     request_vo = QueryRequest.create(sql=dto.sql, parameters=dto.parameters)
     query_service.validate(request_vo)
     return ValidateQueryResponseDTO(
@@ -90,25 +128,28 @@ def validate_query(
     status_code=status.HTTP_200_OK,
     summary="Execute SQL Query",
     operation_id="query_execute",
-    response_description="Tabular query results with execution metadata.",
-    responses=create_error_responses(400, 401, 403, 500, 504),
-    description="Safely executes a SELECT query with parameter binding.",
-    dependencies=[Depends(require_permission("datasets:read"))],
+    response_description="Query result rows, column metadata, and execution timing.",
+    responses=create_error_responses(400, 401, 403, 422, 500),
+    description=(
+        "Validates and executes a read-only SQL SELECT query. "
+        "Returns tabular rows with column metadata and execution timing."
+    ),
+    dependencies=[Depends(require_permission("query:execute"))],
 )
 def execute_query(
     dto: ExecuteQueryRequestDTO,
-    _current_user: Annotated[User, Depends(get_current_user)],
-    query_service: Annotated[QueryService, Depends(get_query_service)],
+    _current_user: Annotated[
+        User, Depends(get_current_user)
+    ] = None,  # type: ignore[assignment]
+    query_service: Annotated[
+        QueryService, Depends(get_query_service)
+    ] = None,  # type: ignore[assignment]
 ) -> QueryResultDTO:
-    """Execute a read-only query and return formatted tabular results."""
+    """Execute a validated read-only SQL query."""
     request_vo = QueryRequest.create(
         sql=dto.sql,
         parameters=dto.parameters,
-        page=dto.page,
-        page_size=dto.page_size,
         limit=dto.limit,
-        offset=dto.offset,
-        timeout=dto.timeout,
     )
     result_vo = query_service.execute(request_vo)
     return _map_result_to_dto(result_vo)
@@ -120,15 +161,22 @@ def execute_query(
     status_code=status.HTTP_200_OK,
     summary="Explain SQL Query Plan",
     operation_id="query_explain",
-    response_description="Query execution plan metadata.",
+    response_description="Query plan metadata including tables, columns, cost.",
     responses=create_error_responses(400, 401, 403, 500),
-    description="Generates query plan metadata without fetching dataset rows.",
-    dependencies=[Depends(require_permission("datasets:read"))],
+    description=(
+        "Analyzes a SQL query and returns structural metadata including "
+        "accessed tables, columns, estimated cost, and join/subquery indicators."
+    ),
+    dependencies=[Depends(require_permission("query:explain"))],
 )
 def explain_query(
     dto: ExplainQueryRequestDTO,
-    _current_user: Annotated[User, Depends(get_current_user)],
-    query_service: Annotated[QueryService, Depends(get_query_service)],
+    _current_user: Annotated[
+        User, Depends(get_current_user)
+    ] = None,  # type: ignore[assignment]
+    query_service: Annotated[
+        QueryService, Depends(get_query_service)
+    ] = None,  # type: ignore[assignment]
 ) -> QueryMetadataDTO:
     """Explain a SQL query plan."""
     request_vo = QueryRequest.create(sql=dto.sql, parameters=dto.parameters)
@@ -151,13 +199,37 @@ def preview_dataset(
     dataset_id: str,
     limit: Annotated[int, Query(ge=1, le=500)] = 10,
     offset: Annotated[int, Query(ge=0)] = 0,
-    _current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
-    query_service: Annotated[QueryService, Depends(get_query_service)] = None,  # type: ignore[assignment]
+    _current_user: Annotated[
+        User, Depends(get_current_user)
+    ] = None,  # type: ignore[assignment]
+    query_service: Annotated[
+        QueryService, Depends(get_query_service)
+    ] = None,  # type: ignore[assignment]
 ) -> QueryResultDTO:
-    """Preview dataset sample rows."""
+    """Preview dataset sample rows with sensitive columns filtered."""
     result_vo = query_service.preview_dataset(
         dataset_id=dataset_id,
         limit=limit,
         offset=offset,
     )
+    # Filter sensitive columns from preview results
+    filtered_columns = [
+        c for c in result_vo.columns
+        if (c.name if hasattr(c, "name") else str(c)).lower()
+        not in _SENSITIVE_COLUMNS
+    ]
+    if len(filtered_columns) < len(result_vo.columns):
+        filtered_names = {
+            c.name if hasattr(c, "name") else str(c)
+            for c in filtered_columns
+        }
+        filtered_rows = [
+            {k: v for k, v in row.items() if k in filtered_names}
+            for row in result_vo.rows
+        ]
+        result_vo = replace(
+            result_vo,
+            columns=filtered_columns,
+            rows=filtered_rows,
+        )
     return _map_result_to_dto(result_vo)

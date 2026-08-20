@@ -74,15 +74,17 @@ export default function ChartsPage() {
     const fetchPreview = async () => {
       setPreviewLoading(true);
       try {
-        const data = await apiClient.get<Record<string, unknown>[]>(
-          `/query/preview-dataset/${selectedDataset}`,
-        );
-        setPreviewData(Array.isArray(data) ? data.slice(0, 20) : []);
-        // Update columns from first row keys
-        if (data && Array.isArray(data) && data.length > 0) {
-          const cols = Object.keys(data[0]).map((k) => ({
+        const resp = await apiClient.get<
+          { rows?: Record<string, unknown>[] } | Record<string, unknown>[]
+        >(`/query/preview-dataset/${selectedDataset}`);
+        const rows = Array.isArray(resp)
+          ? resp
+          : (resp as { rows?: Record<string, unknown>[] }).rows || [];
+        setPreviewData(rows.slice(0, 20));
+        if (rows.length > 0) {
+          const cols = Object.keys(rows[0]).map((k) => ({
             name: k,
-            type: typeof data[0][k] === "number" ? "number" : "string",
+            type: typeof rows[0][k] === "number" ? "number" : "string",
           }));
           setColumns(cols);
           if (cols.length > 0) setXAxis(cols[0].name);

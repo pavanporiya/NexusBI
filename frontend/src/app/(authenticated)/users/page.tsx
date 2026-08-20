@@ -24,31 +24,11 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get<PaginatedResponse<User>>("/users");
-      setUsers(res.items || []);
+      const res = await apiClient.get<User[] | PaginatedResponse<User>>("/users");
+      const items = Array.isArray(res) ? res : (res.items || []);
+      setUsers(items);
     } catch {
-      setUsers([
-        {
-          id: "usr_admin",
-          email: "pavan@nexusbi.io",
-          full_name: "Pavan Poriya",
-          is_active: true,
-          roles: ["Admin", "Security Owner"],
-          permissions: ["*"],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: "usr_analyst",
-          email: "sarah.chen@nexusbi.io",
-          full_name: "Sarah Chen",
-          is_active: true,
-          roles: ["Lead Analyst"],
-          permissions: ["datasets:read", "dashboards:create"],
-          created_at: new Date(Date.now() - 86400000 * 20).toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ]);
+      setUsers([]);
     } finally {
       setLoading(false);
     }

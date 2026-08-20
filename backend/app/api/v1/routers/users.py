@@ -1,18 +1,19 @@
 """User Management REST API endpoints (v1 namespace).
 
-Provides HTTP handlers for retrieving the current user profile, reading
-user details by ID, and updating existing user accounts.
+Provides HTTP handlers for retrieving the current user profile, listing
+all users, reading user details by ID, and updating existing user accounts.
 """
 
 from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 
 from app.api.dependencies.auth import (
     get_current_user,
     get_get_user_use_case,
+    get_list_users_use_case,
     get_update_user_use_case,
 )
 from app.api.dependencies.authorization import require_permission
@@ -20,9 +21,32 @@ from app.application.dto.auth_dto import UserDTO
 from app.application.dto.error_dto import create_error_responses
 from app.application.dto.user_dto import UpdateUserDTO
 from app.application.use_cases import GetUserUseCase, UpdateUserUseCase
+from app.application.use_cases.list_users import ListUsersUseCase
 from app.domain.entities.user import User
 
 router = APIRouter(prefix="/users", tags=["User Management"])
+
+
+@router.get(
+    "",
+    response_model=list[UserDTO],
+    status_code=status.HTTP_200_OK,
+    summary="List all users",
+    operation_id="users_list",
+    response_description="Paginated list of user profiles.",
+    responses=create_error_responses(401, 403, 500),
+    description="List all user accounts. Requires `users:read` permission.",
+    dependencies=[Depends(require_permission("users:read"))],
+)
+def list_users(
+    use_case: Annotated[
+        ListUsersUseCase, Depends(get_list_users_use_case)
+    ],
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> list[UserDTO]:
+    """List all users with pagination."""
+    return use_case.execute(limit=limit, offset=offset)
 
 
 @router.get(
@@ -34,8 +58,9 @@ router = APIRouter(prefix="/users", tags=["User Management"])
     response_description="Current authenticated user profile and permissions.",
     responses=create_error_responses(401, 500),
     description=(
-        "Retrieves detailed profile information for the currently authenticated user, "
-        "including assigned roles and active permission action strings. "
+        "Retrieves detailed profile information for the currently "
+        "authenticated user, including assigned roles and active "
+        "permission action strings. "
         "Requires a valid JWT Bearer authentication token."
     ),
 )
@@ -64,14 +89,17 @@ def get_me(
     response_description="Target user profile details.",
     responses=create_error_responses(401, 403, 404, 422, 500),
     description=(
-        "Retrieves details for a specific user account by user identifier string. "
-        "Requires authentication and the `users:read` RBAC permission."
+        "Retrieves details for a specific user account by user "
+        "identifier string. Requires authentication and the "
+        "`users:read` RBAC permission."
     ),
     dependencies=[Depends(require_permission("users:read"))],
 )
 def get_user_by_id(
     user_id: str,
-    use_case: Annotated[GetUserUseCase, Depends(get_get_user_use_case)],
+    use_case: Annotated[
+        GetUserUseCase, Depends(get_get_user_use_case)
+    ],
 ) -> UserDTO:
     """Retrieve details for a specific user by identifier."""
     return use_case.execute(user_id)
@@ -94,7 +122,9 @@ def get_user_by_id(
 def update_user(
     user_id: str,
     dto: UpdateUserDTO,
-    use_case: Annotated[UpdateUserUseCase, Depends(get_update_user_use_case)],
+    use_case: Annotated[
+        UpdateUserUseCase, Depends(get_update_user_use_case)
+    ],
 ) -> UserDTO:
     """Update editable profile fields for a specific user."""
     return use_case.execute(user_id, dto)
