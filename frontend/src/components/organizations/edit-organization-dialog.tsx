@@ -34,7 +34,7 @@ const editOrganizationSchema = z.object({
     .max(256, "Slug cannot exceed 256 characters")
     .regex(
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      "Slug must contain only lowercase alphanumeric characters and single hyphens (e.g. acme-corp)"
+      "Slug must contain only lowercase alphanumeric characters and single hyphens (e.g. acme-corp)",
     ),
   description: z
     .string()
@@ -100,7 +100,7 @@ export function EditOrganizationDialog({
 
       await apiClient.patch<Organization>(
         `/organizations/${organization.id}`,
-        payload
+        payload,
       );
       toast.success("Organization updated successfully");
       onOpenChange(false);

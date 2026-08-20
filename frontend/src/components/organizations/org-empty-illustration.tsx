@@ -1,5 +1,11 @@
 import React from "react";
-import { Building2, Layers, Database, BarChart3, ShieldCheck } from "lucide-react";
+import {
+  Building2,
+  Layers,
+  Database,
+  BarChart3,
+  ShieldCheck,
+} from "lucide-react";
 
 export function OrgEmptyIllustration() {
   return (
@@ -54,7 +60,9 @@ export function OrgEmptyIllustration() {
         <div className="p-1 rounded-md bg-secondary text-indigo-400">
           <ShieldCheck className="h-3.5 w-3.5" />
         </div>
-        <span className="text-2xs font-medium text-foreground">Multi-tenant</span>
+        <span className="text-2xs font-medium text-foreground">
+          Multi-tenant
+        </span>
       </div>
     </div>
   );

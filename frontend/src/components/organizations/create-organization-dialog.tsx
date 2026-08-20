@@ -42,7 +42,7 @@ const createOrganizationSchema = z.object({
     .max(256, "Slug cannot exceed 256 characters")
     .regex(
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      "Slug must contain only lowercase alphanumeric characters and single hyphens (e.g. acme-corp)"
+      "Slug must contain only lowercase alphanumeric characters and single hyphens (e.g. acme-corp)",
     ),
   description: z
     .string()
@@ -151,7 +151,11 @@ export function CreateOrganizationDialog({
                 {...register("name")}
               />
               {errors.name && (
-                <p id="org-name-error" className="text-xs text-destructive" role="alert">
+                <p
+                  id="org-name-error"
+                  className="text-xs text-destructive"
+                  role="alert"
+                >
                   {errors.name.message}
                 </p>
               )}
@@ -178,7 +182,11 @@ export function CreateOrganizationDialog({
                 })}
               />
               {errors.slug && (
-                <p id="org-slug-error" className="text-xs text-destructive" role="alert">
+                <p
+                  id="org-slug-error"
+                  className="text-xs text-destructive"
+                  role="alert"
+                >
                   {errors.slug.message}
                 </p>
               )}
@@ -187,7 +195,10 @@ export function CreateOrganizationDialog({
             {/* Description Field */}
             <div className="space-y-1.5">
               <Label htmlFor="org-desc" className="text-xs font-medium">
-                Description <span className="text-muted-foreground font-normal">(optional)</span>
+                Description{" "}
+                <span className="text-muted-foreground font-normal">
+                  (optional)
+                </span>
               </Label>
               <Textarea
                 id="org-desc"
@@ -195,11 +206,17 @@ export function CreateOrganizationDialog({
                 disabled={isSubmitting}
                 className="resize-none min-h-[80px]"
                 aria-invalid={!!errors.description}
-                aria-describedby={errors.description ? "org-desc-error" : undefined}
+                aria-describedby={
+                  errors.description ? "org-desc-error" : undefined
+                }
                 {...register("description")}
               />
               {errors.description && (
-                <p id="org-desc-error" className="text-xs text-destructive" role="alert">
+                <p
+                  id="org-desc-error"
+                  className="text-xs text-destructive"
+                  role="alert"
+                >
                   {errors.description.message}
                 </p>
               )}

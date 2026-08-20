@@ -30,7 +30,9 @@ export function EmptyState({
       className={`flex flex-col items-center justify-center text-center p-6 sm:p-10 ${className}`}
     >
       {illustration ? (
-        <div className="mb-6 flex items-center justify-center">{illustration}</div>
+        <div className="mb-6 flex items-center justify-center">
+          {illustration}
+        </div>
       ) : (
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/60 border border-border/50 shadow-inner">
           <Icon className="h-7 w-7 text-muted-foreground" />

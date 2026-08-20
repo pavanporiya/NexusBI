@@ -18,7 +18,13 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import { BarChart3, LineChart as LineChartIcon, AreaChart as AreaChartIcon, PieChart as PieChartIcon, Table as TableIcon } from "lucide-react";
+import {
+  BarChart3,
+  LineChart as LineChartIcon,
+  AreaChart as AreaChartIcon,
+  PieChart as PieChartIcon,
+  Table as TableIcon,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export interface ChartSpecProps {
@@ -51,7 +57,9 @@ export function NexusChart({ spec, className }: ChartSpecProps) {
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle className="text-sm">{spec?.title || "Chart Specification"}</CardTitle>
+          <CardTitle className="text-sm">
+            {spec?.title || "Chart Specification"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="py-8 text-center text-xs text-muted-foreground">
@@ -64,7 +72,7 @@ export function NexusChart({ spec, className }: ChartSpecProps) {
 
   const chartType = spec.type.toLowerCase().replace("_chart", "");
   const xAxisKey = spec.x_axis || Object.keys(spec.data[0])[0];
-  
+
   let yAxisKeys: string[] = [];
   if (Array.isArray(spec.y_axis)) {
     yAxisKeys = spec.y_axis;
@@ -74,17 +82,28 @@ export function NexusChart({ spec, className }: ChartSpecProps) {
     yAxisKeys = Object.keys(spec.data[0]).filter((k) => k !== xAxisKey);
   }
 
-  const colors = (spec.metadata?.recommended_colors as string[]) || DEFAULT_PALETTE;
+  const colors =
+    (spec.metadata?.recommended_colors as string[]) || DEFAULT_PALETTE;
 
   return (
     <Card className={className}>
       <CardHeader className="py-3 px-4 flex flex-row items-center justify-between border-b border-border">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
-          {chartType === "line" && <LineChartIcon className="h-4 w-4 text-primary" />}
-          {chartType === "bar" && <BarChart3 className="h-4 w-4 text-primary" />}
-          {chartType === "area" && <AreaChartIcon className="h-4 w-4 text-primary" />}
-          {chartType === "pie" && <PieChartIcon className="h-4 w-4 text-primary" />}
-          {chartType === "table" && <TableIcon className="h-4 w-4 text-primary" />}
+          {chartType === "line" && (
+            <LineChartIcon className="h-4 w-4 text-primary" />
+          )}
+          {chartType === "bar" && (
+            <BarChart3 className="h-4 w-4 text-primary" />
+          )}
+          {chartType === "area" && (
+            <AreaChartIcon className="h-4 w-4 text-primary" />
+          )}
+          {chartType === "pie" && (
+            <PieChartIcon className="h-4 w-4 text-primary" />
+          )}
+          {chartType === "table" && (
+            <TableIcon className="h-4 w-4 text-primary" />
+          )}
           {spec.title}
         </CardTitle>
       </CardHeader>
@@ -95,7 +114,10 @@ export function NexusChart({ spec, className }: ChartSpecProps) {
               <thead className="bg-muted/50 sticky top-0">
                 <tr>
                   {Object.keys(spec.data[0]).map((col) => (
-                    <th key={col} className="p-2 font-mono text-2xs font-semibold border-b">
+                    <th
+                      key={col}
+                      className="p-2 font-mono text-2xs font-semibold border-b"
+                    >
                       {col}
                     </th>
                   ))}
@@ -106,7 +128,9 @@ export function NexusChart({ spec, className }: ChartSpecProps) {
                   <tr key={i} className="hover:bg-muted/30">
                     {Object.keys(spec.data[0]).map((col) => (
                       <td key={col} className="p-2 font-mono text-2xs">
-                        {row[col] !== null && row[col] !== undefined ? String(row[col]) : "null"}
+                        {row[col] !== null && row[col] !== undefined
+                          ? String(row[col])
+                          : "null"}
                       </td>
                     ))}
                   </tr>
@@ -188,7 +212,10 @@ export function NexusChart({ spec, className }: ChartSpecProps) {
                     label
                   >
                     {spec.data.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={colors[index % colors.length]}
+                      />
                     ))}
                   </Pie>
                 </PieChart>

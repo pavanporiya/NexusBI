@@ -40,7 +40,13 @@ export default function PermissionsPage() {
         const roles = await apiClient.get<Role[]>("/roles");
         const permMap = new Map<
           string,
-          { id: string; domain: string; action: string; description: string; roles: string[] }
+          {
+            id: string;
+            domain: string;
+            action: string;
+            description: string;
+            roles: string[];
+          }
         >();
 
         for (const role of Array.isArray(roles) ? roles : []) {

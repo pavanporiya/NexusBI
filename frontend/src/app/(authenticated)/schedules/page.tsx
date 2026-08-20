@@ -27,7 +27,9 @@ export default function SchedulesPage() {
   const fetchSchedules = async () => {
     try {
       setLoading(true);
-      const data = await apiClient.get<{ items: Report[] }>("/reports?limit=100");
+      const data = await apiClient.get<{ items: Report[] }>(
+        "/reports?limit=100",
+      );
       const items = data?.items || (Array.isArray(data) ? data : []);
       // Show only reports that have a schedule configured
       setSchedules(items.filter((r) => r.schedule && r.schedule.trim() !== ""));
@@ -156,7 +158,8 @@ export default function SchedulesPage() {
             Schedules
           </h1>
           <p className="text-xs text-muted-foreground">
-            Automated report dispatch timers. Configure schedules on the Reports page.
+            Automated report dispatch timers. Configure schedules on the Reports
+            page.
           </p>
         </div>
       </div>
@@ -167,10 +170,13 @@ export default function SchedulesPage() {
           Loading schedules…
         </div>
       ) : error ? (
-        <div className="text-center py-12 text-destructive text-sm">{error}</div>
+        <div className="text-center py-12 text-destructive text-sm">
+          {error}
+        </div>
       ) : schedules.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground text-sm">
-          No scheduled reports yet. Create a report with a schedule to see it here.
+          No scheduled reports yet. Create a report with a schedule to see it
+          here.
         </div>
       ) : (
         <DataTable

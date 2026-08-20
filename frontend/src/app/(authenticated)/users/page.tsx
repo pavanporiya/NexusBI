@@ -24,8 +24,10 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get<User[] | PaginatedResponse<User>>("/users");
-      const items = Array.isArray(res) ? res : (res.items || []);
+      const res = await apiClient.get<User[] | PaginatedResponse<User>>(
+        "/users",
+      );
+      const items = Array.isArray(res) ? res : res.items || [];
       setUsers(items);
     } catch {
       setUsers([]);

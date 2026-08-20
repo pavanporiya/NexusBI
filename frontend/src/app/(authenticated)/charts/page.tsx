@@ -47,7 +47,9 @@ export default function ChartsPage() {
   useEffect(() => {
     const fetchDatasets = async () => {
       try {
-        const data = await apiClient.get<{ items: Dataset[] }>("/datasets?limit=20");
+        const data = await apiClient.get<{ items: Dataset[] }>(
+          "/datasets?limit=20",
+        );
         const items = data?.items || (Array.isArray(data) ? data : []);
         setDatasets(items);
         if (items.length > 0) {
@@ -110,9 +112,10 @@ export default function ChartsPage() {
       : "Select a dataset",
     x_axis: xAxis,
     y_axis: yAxis,
-    data: previewData.length > 0
-      ? previewData
-      : [{ [xAxis || "label"]: "No data", [yAxis || "value"]: 0 }],
+    data:
+      previewData.length > 0
+        ? previewData
+        : [{ [xAxis || "label"]: "No data", [yAxis || "value"]: 0 }],
   };
 
   return (
@@ -144,7 +147,10 @@ export default function ChartsPage() {
             <CardContent className="space-y-4">
               <div className="space-y-1">
                 <Label>Dataset</Label>
-                <Select value={selectedDataset} onValueChange={setSelectedDataset}>
+                <Select
+                  value={selectedDataset}
+                  onValueChange={setSelectedDataset}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select dataset" />
                   </SelectTrigger>
@@ -183,7 +189,10 @@ export default function ChartsPage() {
                   <SelectContent>
                     {columns.map((c) => (
                       <SelectItem key={c.name} value={c.name}>
-                        {c.name} <span className="text-muted-foreground ml-1 text-2xs">({c.type})</span>
+                        {c.name}{" "}
+                        <span className="text-muted-foreground ml-1 text-2xs">
+                          ({c.type})
+                        </span>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -197,18 +206,24 @@ export default function ChartsPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {(numericColumns.length > 0 ? numericColumns : columns).map((c) => (
-                      <SelectItem key={c.name} value={c.name}>
-                        {c.name} <span className="text-muted-foreground ml-1 text-2xs">({c.type})</span>
-                      </SelectItem>
-                    ))}
+                    {(numericColumns.length > 0 ? numericColumns : columns).map(
+                      (c) => (
+                        <SelectItem key={c.name} value={c.name}>
+                          {c.name}{" "}
+                          <span className="text-muted-foreground ml-1 text-2xs">
+                            ({c.type})
+                          </span>
+                        </SelectItem>
+                      ),
+                    )}
                   </SelectContent>
                 </Select>
               </div>
 
               {previewLoading && (
                 <div className="flex items-center text-xs text-muted-foreground">
-                  <Loader2 className="mr-1 h-3 w-3 animate-spin" /> Loading preview…
+                  <Loader2 className="mr-1 h-3 w-3 animate-spin" /> Loading
+                  preview…
                 </div>
               )}
 
