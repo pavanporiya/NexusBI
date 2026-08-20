@@ -160,3 +160,19 @@ class ValidateChartResponseDTO(BaseModel):
     errors: list[str] = Field(
         default_factory=list, description="List of validation errors if invalid"
     )
+
+
+class ChartSpecDTO(BaseModel):
+    """Data Transfer Object representing a structured chart specification."""
+
+    type: str = Field(..., description="Chart type: line, bar, area, pie, table")
+    title: str = Field(..., description="Chart display title")
+    x_axis: str | None = Field(default=None, description="X-axis category/dimension")
+    y_axis: Any = Field(default=None, description="Y-axis metric(s)")
+    data: list[dict[str, Any]] = Field(default_factory=list, description="Data points")
+    series: list[dict[str, Any]] | None = Field(
+        default=None, description="Series details"
+    )
+    labels: list[str] | None = Field(default=None, description="Category labels")
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Chart metadata")
+

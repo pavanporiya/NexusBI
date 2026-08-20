@@ -257,6 +257,32 @@ PERM_MEMBERSHIPS_DELETE = Permission(
     description="Remove members from workspaces",
 )
 
+# AI Agents
+PERM_AGENTS_EXECUTE = Permission(
+    id="perm-agents-execute",
+    resource="agents",
+    action="execute",
+    description="Execute AI agent queries and workflows",
+)
+PERM_AGENTS_READ = Permission(
+    id="perm-agents-read",
+    resource="agents",
+    action="read",
+    description="Read AI agent run history and execution details",
+)
+PERM_AGENTS_APPROVE = Permission(
+    id="perm-agents-approve",
+    resource="agents",
+    action="approve",
+    description="Approve or reject HITL agent approval gates",
+)
+PERM_AGENTS_ADMIN = Permission(
+    id="perm-agents-admin",
+    resource="agents",
+    action="admin",
+    description="Configure AI agent platform settings and guardrails",
+)
+
 DEFAULT_PERMISSIONS: tuple[Permission, ...] = (
     PERM_USERS_CREATE,
     PERM_USERS_READ,
@@ -295,6 +321,10 @@ DEFAULT_PERMISSIONS: tuple[Permission, ...] = (
     PERM_MEMBERSHIPS_READ,
     PERM_MEMBERSHIPS_UPDATE,
     PERM_MEMBERSHIPS_DELETE,
+    PERM_AGENTS_EXECUTE,
+    PERM_AGENTS_READ,
+    PERM_AGENTS_APPROVE,
+    PERM_AGENTS_ADMIN,
 )
 
 # ----------------------------------------------------------------------
@@ -356,6 +386,10 @@ def _create_default_roles() -> tuple[Role, ...]:
             PERM_MEMBERSHIPS_READ,
             PERM_MEMBERSHIPS_UPDATE,
             PERM_MEMBERSHIPS_DELETE,
+            PERM_AGENTS_EXECUTE,
+            PERM_AGENTS_READ,
+            PERM_AGENTS_APPROVE,
+            PERM_AGENTS_ADMIN,
         ],
     )
 
@@ -379,6 +413,9 @@ def _create_default_roles() -> tuple[Role, ...]:
             PERM_DATASETS_READ,
             PERM_DATASETS_UPDATE,
             PERM_SETTINGS_READ,
+            PERM_AGENTS_EXECUTE,
+            PERM_AGENTS_READ,
+            PERM_AGENTS_APPROVE,
         ],
     )
 
@@ -400,6 +437,8 @@ def _create_default_roles() -> tuple[Role, ...]:
             PERM_DATASETS_CREATE,
             PERM_DATASETS_READ,
             PERM_DATASETS_UPDATE,
+            PERM_AGENTS_EXECUTE,
+            PERM_AGENTS_READ,
         ],
     )
 
@@ -413,6 +452,7 @@ def _create_default_roles() -> tuple[Role, ...]:
             PERM_DASHBOARD_READ,
             PERM_REPORTS_READ,
             PERM_DATASETS_READ,
+            PERM_AGENTS_READ,
         ],
     )
 

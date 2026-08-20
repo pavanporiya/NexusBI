@@ -50,7 +50,7 @@ class AddMemberUseCase:
                 "Membership", f"workspace:{workspace_id}, user:{dto.user_id}"
             )
 
-        mem_id = f"mem-{uuid.uuid4()}"
+        mem_id = str(uuid.uuid4())
         membership = Membership(
             id=mem_id,
             workspace_id=workspace_id,

@@ -103,6 +103,17 @@ class ChartType(StrEnum):
         if not isinstance(val, str):
             raise ValueError(f"Invalid chart type: {val}")
         normalized = val.strip().lower()
+        alias_map = {
+            "line": cls.LINE_CHART,
+            "bar": cls.BAR_CHART,
+            "area": cls.AREA_CHART,
+            "pie": cls.PIE_CHART,
+            "donut": cls.DONUT_CHART,
+            "kpi": cls.KPI,
+            "table": cls.TABLE,
+        }
+        if normalized in alias_map:
+            return alias_map[normalized]
         for member in cls:
             if member.value == normalized or member.name.lower() == normalized:
                 return member

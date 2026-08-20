@@ -5,6 +5,12 @@
 # Loaded at FastAPI startup and parsed into Pydantic models.
 
 features:
+  # Autonomous AI Agent layer
+  enable_agents:
+    description: "Enable enterprise multi-agent execution pipeline"
+    default: true
+    rollout_percentage: 100
+
   # AI-powered natural language query pipeline
   enable_chat:
     description: "Enable the AI-powered natural language query chat interface"

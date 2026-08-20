@@ -14,17 +14,6 @@ import { DataTable } from "@/components/data-table/data-table";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,13 +25,16 @@ import { formatRelativeTime } from "@/lib/utils";
 import type { Organization, PaginatedResponse } from "@/types/api";
 import { toast } from "sonner";
 
+import { OrgEmptyIllustration } from "@/components/organizations/org-empty-illustration";
+import { CreateOrganizationDialog } from "@/components/organizations/create-organization-dialog";
+import { EditOrganizationDialog } from "@/components/organizations/edit-organization-dialog";
+
 export default function OrganizationsPage() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [newOrg, setNewOrg] = useState({ name: "", slug: "", description: "" });
-  const [submitting, setSubmitting] = useState(false);
+  const [editingOrg, setEditingOrg] = useState<Organization | null>(null);
 
   const fetchOrganizations = async () => {
     setLoading(true);
@@ -64,22 +56,6 @@ export default function OrganizationsPage() {
   useEffect(() => {
     fetchOrganizations();
   }, []);
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      await apiClient.post("/organizations", newOrg);
-      toast.success("Organization created successfully");
-      setIsCreateOpen(false);
-      setNewOrg({ name: "", slug: "", description: "" });
-      fetchOrganizations();
-    } catch {
-      toast.error("Failed to create organization");
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const handleDelete = async (id: string) => {
     try {
@@ -146,7 +122,7 @@ export default function OrganizationsPage() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setEditingOrg(row.original)}>
               <Edit className="mr-2 h-3.5 w-3.5" /> Edit Organization
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -163,19 +139,22 @@ export default function OrganizationsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            Organizations
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            Manage multi-tenant enterprise organizations.
-          </p>
+      {/* Render top header bar when organizations exist or loading/error */}
+      {(loading || error || organizations.length > 0) && (
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              Organizations
+            </h1>
+            <p className="text-xs text-muted-foreground">
+              Manage multi-tenant enterprise organizations.
+            </p>
+          </div>
+          <Button size="sm" onClick={() => setIsCreateOpen(true)}>
+            <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Organization
+          </Button>
         </div>
-        <Button size="sm" onClick={() => setIsCreateOpen(true)}>
-          <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Organization
-        </Button>
-      </div>
+      )}
 
       {error ? (
         <EmptyState
@@ -188,15 +167,21 @@ export default function OrganizationsPage() {
           }}
         />
       ) : !loading && organizations.length === 0 ? (
-        <EmptyState
-          icon={Building2}
-          title="No organizations found"
-          description="Create your first organization to begin using NexusBI."
-          action={{
-            label: "Create Organization",
-            onClick: () => setIsCreateOpen(true),
-          }}
-        />
+        <section
+          aria-label="Welcome and organization setup"
+          className="flex min-h-[calc(100vh-11rem)] w-full items-center justify-center rounded-xl border border-border/40 bg-card/30 p-4 sm:p-8 backdrop-blur-xs"
+        >
+          <EmptyState
+            illustration={<OrgEmptyIllustration />}
+            title="Welcome to NexusBI"
+            description="Create your first organization to start managing workspaces, datasets, dashboards, and reports."
+            action={{
+              label: "Create Organization",
+              onClick: () => setIsCreateOpen(true),
+              icon: Plus,
+            }}
+          />
+        </section>
       ) : (
         <DataTable
           columns={columns}
@@ -207,73 +192,20 @@ export default function OrganizationsPage() {
         />
       )}
 
-      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent>
-          <form onSubmit={handleCreate}>
-            <DialogHeader>
-              <DialogTitle>Create Organization</DialogTitle>
-              <DialogDescription>
-                Add a new tenant organization to the platform.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-3 py-4">
-              <div className="space-y-1">
-                <Label htmlFor="org-name">Organization Name</Label>
-                <Input
-                  id="org-name"
-                  placeholder="Acme Enterprise"
-                  required
-                  value={newOrg.name}
-                  onChange={(e) =>
-                    setNewOrg({
-                      ...newOrg,
-                      name: e.target.value,
-                      slug: e.target.value
-                        .toLowerCase()
-                        .replace(/[^a-z0-9]/g, "-"),
-                    })
-                  }
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="org-slug">Slug Identifier</Label>
-                <Input
-                  id="org-slug"
-                  placeholder="acme-enterprise"
-                  required
-                  value={newOrg.slug}
-                  onChange={(e) =>
-                    setNewOrg({ ...newOrg, slug: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="org-desc">Description</Label>
-                <Textarea
-                  id="org-desc"
-                  placeholder="Optional organization details..."
-                  value={newOrg.description}
-                  onChange={(e) =>
-                    setNewOrg({ ...newOrg, description: e.target.value })
-                  }
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsCreateOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" loading={submitting}>
-                Create Organization
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <CreateOrganizationDialog
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        onSuccess={fetchOrganizations}
+      />
+
+      <EditOrganizationDialog
+        organization={editingOrg}
+        open={!!editingOrg}
+        onOpenChange={(open) => {
+          if (!open) setEditingOrg(null);
+        }}
+        onSuccess={fetchOrganizations}
+      />
     </div>
   );
 }

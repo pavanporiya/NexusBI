@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { BarChart3, LineChart, AreaChart, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -18,19 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  LineChart as ReLineChart,
-  Line,
-  AreaChart as ReAreaChart,
-  Area,
-} from "recharts";
+import { NexusChart } from "@/components/chart/nexus-chart";
 
 const SAMPLE_DATA = [
   { region: "North America", revenue: 45200, orders: 1240 },
@@ -45,6 +33,17 @@ export default function ChartsPage() {
   const [xAxis, setXAxis] = useState("region");
   const [yAxis, setYAxis] = useState("revenue");
 
+  const spec = {
+    type: chartType,
+    title:
+      yAxis === "revenue"
+        ? "Regional Revenue Distribution ($)"
+        : "Order Volume by Region",
+    x_axis: xAxis,
+    y_axis: yAxis,
+    data: SAMPLE_DATA,
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -53,8 +52,8 @@ export default function ChartsPage() {
             Chart Generator
           </h1>
           <p className="text-xs text-muted-foreground">
-            Build interactive bar, line, and area charts backed by typed
-            Universal Chart Engine strategies.
+            Build interactive bar, line, area, pie, and table visual models
+            backed by typed Universal Chart Engine specifications.
           </p>
         </div>
         <Button size="sm">
@@ -82,6 +81,8 @@ export default function ChartsPage() {
                   <SelectItem value="bar">Bar Chart</SelectItem>
                   <SelectItem value="line">Line Chart</SelectItem>
                   <SelectItem value="area">Area Chart</SelectItem>
+                  <SelectItem value="pie">Pie Chart</SelectItem>
+                  <SelectItem value="table">Table</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -114,85 +115,9 @@ export default function ChartsPage() {
         </Card>
 
         {/* Chart Visualization */}
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle className="text-sm flex items-center gap-2">
-              {chartType === "bar" && (
-                <BarChart3 className="h-4 w-4 text-primary" />
-              )}
-              {chartType === "line" && (
-                <LineChart className="h-4 w-4 text-primary" />
-              )}
-              {chartType === "area" && (
-                <AreaChart className="h-4 w-4 text-primary" />
-              )}
-              {yAxis === "revenue"
-                ? "Regional Revenue Distribution ($)"
-                : "Order Volume by Region"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-80 w-full pt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                {chartType === "bar" ? (
-                  <BarChart data={SAMPLE_DATA}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#232329" />
-                    <XAxis dataKey={xAxis} stroke="#a1a1aa" fontSize={11} />
-                    <YAxis stroke="#a1a1aa" fontSize={11} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#111113",
-                        borderColor: "#232329",
-                        color: "#fafafa",
-                      }}
-                    />
-                    <Bar dataKey={yAxis} fill="#3B82F6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                ) : chartType === "line" ? (
-                  <ReLineChart data={SAMPLE_DATA}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#232329" />
-                    <XAxis dataKey={xAxis} stroke="#a1a1aa" fontSize={11} />
-                    <YAxis stroke="#a1a1aa" fontSize={11} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#111113",
-                        borderColor: "#232329",
-                        color: "#fafafa",
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey={yAxis}
-                      stroke="#3B82F6"
-                      strokeWidth={2}
-                      dot={{ fill: "#3B82F6" }}
-                    />
-                  </ReLineChart>
-                ) : (
-                  <ReAreaChart data={SAMPLE_DATA}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#232329" />
-                    <XAxis dataKey={xAxis} stroke="#a1a1aa" fontSize={11} />
-                    <YAxis stroke="#a1a1aa" fontSize={11} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#111113",
-                        borderColor: "#232329",
-                        color: "#fafafa",
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey={yAxis}
-                      stroke="#3B82F6"
-                      fill="#3B82F6"
-                      fillOpacity={0.2}
-                    />
-                  </ReAreaChart>
-                )}
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="lg:col-span-3">
+          <NexusChart spec={spec} />
+        </div>
       </div>
     </div>
   );

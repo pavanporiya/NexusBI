@@ -401,7 +401,7 @@ def test_settings() -> Generator[Settings]:
 - Overrides key environment variables for testing:
   - `ENV = "testing"`
   - `DEBUG = "true"`
-  - `POSTGRES_DB = "nexusbi_testing"` (separate test database)
+  - `POSTGRES_DB = "nexusbi_metadata"` (configurable metadata database)
   - `SECRET_KEY = "test_secret_key_not_for_production"`
 
 **Cache Management:**

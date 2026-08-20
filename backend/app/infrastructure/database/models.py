@@ -45,13 +45,13 @@ role_permissions = Table(
     Base.metadata,
     Column(
         "role_id",
-        String(36),
+        String(64),
         ForeignKey("roles.id", ondelete="CASCADE"),
         primary_key=True,
     ),
     Column(
         "permission_id",
-        String(36),
+        String(64),
         ForeignKey("permissions.id", ondelete="CASCADE"),
         primary_key=True,
     ),
@@ -62,13 +62,13 @@ user_roles = Table(
     Base.metadata,
     Column(
         "user_id",
-        String(36),
+        String(64),
         ForeignKey("users.id", ondelete="CASCADE"),
         primary_key=True,
     ),
     Column(
         "role_id",
-        String(36),
+        String(64),
         ForeignKey("roles.id", ondelete="CASCADE"),
         primary_key=True,
     ),
@@ -92,7 +92,7 @@ class PermissionModel(Base):
         UniqueConstraint("resource", "action", name="uq_permissions_resource_action"),
     )
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
     resource: Mapped[str] = mapped_column(String(128), nullable=False)
     action: Mapped[str] = mapped_column(String(128), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -119,7 +119,7 @@ class RoleModel(Base):
 
     __tablename__ = "roles"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
     name: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
@@ -149,7 +149,7 @@ class UserModel(Base):
 
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
     email: Mapped[str] = mapped_column(
         String(320), nullable=False, unique=True, index=True
     )
@@ -192,9 +192,9 @@ class SessionModel(Base):
 
     __tablename__ = "sessions"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
     user_id: Mapped[str] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
@@ -239,22 +239,22 @@ class DashboardModel(Base):
 
     __tablename__ = "dashboards"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
     name: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
     owner_id: Mapped[str] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     dataset_id: Mapped[str] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("datasets.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     workspace_id: Mapped[str | None] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("workspaces.id", ondelete="CASCADE"),
         nullable=True,
         index=True,
@@ -299,22 +299,22 @@ class DatasetModel(Base):
 
     __tablename__ = "datasets"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
     name: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
     source_type: Mapped[str] = mapped_column(String(64), nullable=False)
     query_or_table: Mapped[str] = mapped_column(Text, nullable=False)
     object_type: Mapped[str | None] = mapped_column(String(32), nullable=True)
     object_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
     sql_query: Mapped[str | None] = mapped_column(Text, nullable=True)
-    connection_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    connection_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     owner_id: Mapped[str] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     workspace_id: Mapped[str | None] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("workspaces.id", ondelete="CASCADE"),
         nullable=True,
         index=True,
@@ -345,22 +345,22 @@ class ReportModel(Base):
 
     __tablename__ = "reports"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
     name: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
     dataset_id: Mapped[str] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("datasets.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     owner_id: Mapped[str] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     workspace_id: Mapped[str | None] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("workspaces.id", ondelete="CASCADE"),
         nullable=True,
         index=True,
@@ -400,7 +400,7 @@ class OrganizationModel(Base):
 
     __tablename__ = "organizations"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
     name: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
     slug: Mapped[str] = mapped_column(
         String(256), nullable=False, unique=True, index=True
@@ -433,9 +433,9 @@ class WorkspaceModel(Base):
         ),
     )
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
     organization_id: Mapped[str] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("organizations.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
@@ -476,21 +476,21 @@ class MembershipModel(Base):
         ),
     )
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
     workspace_id: Mapped[str] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("workspaces.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     user_id: Mapped[str] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     role_id: Mapped[str] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("roles.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
@@ -523,15 +523,15 @@ class WidgetModel(Base):
         UniqueConstraint("dashboard_id", "title", name="uq_widgets_dashboard_title"),
     )
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
     dashboard_id: Mapped[str] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("dashboards.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     dataset_id: Mapped[str] = mapped_column(
-        String(36),
+        String(64),
         ForeignKey("datasets.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
@@ -562,3 +562,76 @@ class WidgetModel(Base):
             f"WidgetModel(id={self.id!r}, title={self.title!r}, "
             f"dashboard_id={self.dashboard_id!r})"
         )
+
+
+class AgentRunModel(Base):
+    """ORM model for the ``agent_runs`` table.
+
+    Represents a single AI agent execution lifecycle from NL query
+    submission through SQL generation and execution.
+    """
+
+    __tablename__ = "agent_runs"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    dataset_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("datasets.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    organization_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    workspace_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    agent_role: Mapped[str | None] = mapped_column(
+        String(64), nullable=True, default="sql_data"
+    )
+    natural_language_query: Mapped[str] = mapped_column(Text, nullable=False)
+    generated_sql: Mapped[str | None] = mapped_column(Text, nullable=True)
+    insights: Mapped[str | None] = mapped_column(Text, nullable=True)
+    visualization_config_json: Mapped[dict[str, Any] | None] = mapped_column(
+        JSON, nullable=True
+    )
+    code_snippet: Mapped[str | None] = mapped_column(Text, nullable=True)
+    query_result_json: Mapped[dict[str, Any] | None] = mapped_column(
+        JSON, nullable=True
+    )
+    status: Mapped[str] = mapped_column(
+        String(32), nullable=False, default="pending", index=True
+    )
+    confidence: Mapped[float] = mapped_column(
+        "confidence",
+        nullable=False,
+        default=0.0,
+    )
+    steps_json: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSON, nullable=False, default=list
+    )
+    total_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    total_cost_usd: Mapped[float] = mapped_column(
+        "total_cost_usd",
+        nullable=False,
+        default=0.0,
+    )
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+
+    user: Mapped[UserModel] = relationship("UserModel")
+    dataset: Mapped[DatasetModel] = relationship("DatasetModel")
+
+    def __repr__(self) -> str:
+        return (
+            f"AgentRunModel(id={self.id!r}, user_id={self.user_id!r}, "
+            f"status={self.status!r})"
+        )
+

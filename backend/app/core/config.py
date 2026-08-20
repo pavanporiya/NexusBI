@@ -145,6 +145,7 @@ class Settings(BaseSettings):
     SNOWFLAKE_QUERY_TIMEOUT: int = 30
 
     # ── AI Model Configuration ─────────────────────────────────────────
+    LLM_PROVIDER: str = "anthropic"  # "anthropic" | "ollama" | "mock"
     ANTHROPIC_API_KEY: SecretStr = SecretStr("")
     OPENAI_API_KEY: SecretStr = SecretStr("")
     LLM_PRIMARY_MODEL: str = "claude-sonnet-4-20250514"
@@ -152,14 +153,24 @@ class Settings(BaseSettings):
     LLM_REQUEST_TIMEOUT: int = 15
     LLM_MAX_RETRIES: int = 2
 
+    # ── Ollama Configuration ───────────────────────────────────────────
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "llama3.1"
+
     # ── Feature Flags ──────────────────────────────────────────────────
     ENABLE_SEMANTIC_CACHE: bool = False
     ENABLE_FORECASTING: bool = True
     ENABLE_AUDIT_LOGGING: bool = True
+    ENABLE_AGENTS: bool = True
 
     # ── Rate Limiting ──────────────────────────────────────────────────
     RATE_LIMIT_REQUESTS_PER_MINUTE: int = 60
     RATE_LIMIT_CHAT_MESSAGES_PER_MINUTE: int = 30
+    RATE_LIMIT_AGENT_REQUESTS_PER_MINUTE: int = 10
+
+    # ── AI Agent Guardrails ────────────────────────────────────────────
+    AGENT_MAX_COST_PER_RUN_USD: float = 0.50
+    AGENT_MAX_DAILY_COST_PER_USER_USD: float = 10.00
 
     # ── Query Guardrails ───────────────────────────────────────────────
     MAX_QUERY_ROW_LIMIT: int = 50_000

@@ -219,6 +219,32 @@ class AITimeoutError(AIProviderError):
         )
 
 
+class AgentRunError(NexusBIError):
+    """Agent pipeline run failed during execution."""
+
+    def __init__(
+        self,
+        message: str = "Agent execution failed",
+        detail: str | None = None,
+    ) -> None:
+        super().__init__(
+            code="NBI-2004",
+            message=message,
+            status_code=500,
+            detail=detail,
+        )
+
+
+class AgentTimeoutError(AgentRunError):
+    """Agent pipeline execution exceeded the maximum allowed time."""
+
+    def __init__(self, timeout_seconds: int = 30) -> None:
+        super().__init__(
+            message=f"Agent run timed out after {timeout_seconds}s",
+            detail="The agent execution exceeded the maximum allowed pipeline runtime.",
+        )
+
+
 class SQLValidationError(NexusBIError):
     """Generated SQL failed AST security validation checks."""
 

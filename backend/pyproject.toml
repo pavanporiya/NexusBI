@@ -77,6 +77,9 @@ select = [
 ]
 ignore = []
 
+[tool.ruff.lint.per-file-ignores]
+"migrations/versions/*.py" = ["E501"]
+
 [tool.ruff.lint.isort]
 combine-as-imports = true
 force-single-line = false

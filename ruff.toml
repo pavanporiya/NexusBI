@@ -16,6 +16,9 @@ select = [
 ]
 ignore = []
 
+[lint.per-file-ignores]
+"migrations/versions/*.py" = ["E501"]
+
 [lint.isort]
 combine-as-imports = true
 force-single-line = false

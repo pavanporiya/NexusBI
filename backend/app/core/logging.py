@@ -319,3 +319,29 @@ class AuditLogger:
             resource_id=resource_id,
             action=action,
         )
+
+    def log_agent_run(
+        self,
+        *,
+        run_id: str,
+        user_id: str,
+        dataset_id: str,
+        query: str,
+        status: str,
+        total_tokens: int = 0,
+        total_cost_usd: float = 0.0,
+        error: str | None = None,
+    ) -> None:
+        """Record an AI agent pipeline run for audit compliance."""
+        self._logger.info(
+            "agent_run",
+            run_id=run_id,
+            user_id=user_id,
+            dataset_id=dataset_id,
+            query=query,
+            status=status,
+            total_tokens=total_tokens,
+            total_cost_usd=round(total_cost_usd, 4),
+            error=error,
+        )
+

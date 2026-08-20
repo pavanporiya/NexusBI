@@ -13,6 +13,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from app.application.services import QueryService
+from app.application.services.agent_tool_registry import AgentToolRegistry
 from app.application.services.connector_service import ConnectorService
 from app.application.services.interfaces import (
     IAuthorizationService,
@@ -70,10 +71,16 @@ from app.application.use_cases import (
     UpdateWidgetUseCase,
     UpdateWorkspaceUseCase,
 )
+from app.application.use_cases.execute_agent_query import ExecuteAgentQueryUseCase
+from app.application.use_cases.get_agent_run import (
+    GetAgentRunUseCase,
+    ListAgentRunsUseCase,
+)
 from app.core.config import get_settings
 from app.core.dependencies import get_db
 from app.core.exceptions import AuthenticationError
 from app.domain.entities.user import User
+from app.domain.repositories.agent_run_repository import IAgentRunRepository
 from app.domain.repositories.dashboard_repository import IDashboardRepository
 from app.domain.repositories.dataset_repository import IDatasetRepository
 from app.domain.repositories.membership_repository import IMembershipRepository
@@ -84,6 +91,7 @@ from app.domain.repositories.session_repository import ISessionRepository
 from app.domain.repositories.user_repository import IUserRepository
 from app.domain.repositories.widget_repository import IWidgetRepository
 from app.domain.repositories.workspace_repository import IWorkspaceRepository
+from app.infrastructure.llm.provider_service import LLMProviderService
 from app.infrastructure.repositories.dashboard_repository import (
     SQLAlchemyDashboardRepository,
 )
@@ -120,6 +128,7 @@ from app.infrastructure.services.jwt_token_service import JWTTokenService
 
 if TYPE_CHECKING:
     from app.application.services.chart_service import ChartService
+    from app.application.services.visualization_service import VisualizationService
 
 security = HTTPBearer(auto_error=False)
 
@@ -729,3 +738,154 @@ def get_chart_service() -> ChartService:
     from app.application.services.chart_service import ChartService
 
     return ChartService()
+
+
+# ---------------------------------------------------------------------------
+# AI Agent Dependencies
+# ---------------------------------------------------------------------------
+
+
+def get_agent_run_repository(
+    db: Annotated[Session, Depends(get_db)],
+) -> IAgentRunRepository:
+    """Dependency provider for IAgentRunRepository."""
+    from app.infrastructure.repositories.agent_run_repository import (
+        SQLAlchemyAgentRunRepository,
+    )
+
+    return SQLAlchemyAgentRunRepository(db)
+
+
+def get_llm_provider_service() -> LLMProviderService:
+    """Dependency provider for LLMProviderService with config-driven provider selection.
+
+    Provider is selected via the ``LLM_PROVIDER`` environment variable:
+    - ``anthropic`` (default): Uses Anthropic Claude API.
+    - ``ollama``: Uses local Ollama instance.
+    - ``mock``: Uses test/development mock provider.
+    """
+    from app.core.config import settings
+    from app.core.logging import AuditLogger
+    from app.infrastructure.llm.provider_service import LLMProviderService
+
+    provider_name = settings.LLM_PROVIDER.strip().lower()
+    audit_logger = AuditLogger()
+
+    if provider_name == "ollama":
+        from app.infrastructure.llm.ollama_provider import OllamaProvider
+
+        return LLMProviderService(
+            primary=OllamaProvider(
+                base_url=settings.OLLAMA_BASE_URL,
+                default_model=settings.OLLAMA_MODEL,
+                timeout_seconds=settings.LLM_REQUEST_TIMEOUT,
+            ),
+            audit_logger=audit_logger,
+        )
+
+    if provider_name == "mock":
+        from app.infrastructure.llm.mock_provider import MockProvider
+
+        return LLMProviderService(
+            primary=MockProvider(),
+            audit_logger=audit_logger,
+        )
+
+    # Default: Anthropic
+    from app.infrastructure.llm.anthropic_provider import AnthropicProvider
+
+    api_key = settings.ANTHROPIC_API_KEY.get_secret_value()
+    return LLMProviderService(
+        primary=AnthropicProvider(
+            api_key=api_key,
+            default_model=settings.LLM_PRIMARY_MODEL,
+            timeout_seconds=settings.LLM_REQUEST_TIMEOUT,
+            max_retries=settings.LLM_MAX_RETRIES,
+        ),
+        audit_logger=audit_logger,
+    )
+
+
+def get_agent_tool_registry(
+    query_service: Annotated[QueryService, Depends(get_query_service)],
+    dataset_repo: Annotated[IDatasetRepository, Depends(get_dataset_repository)],
+    auth_service: Annotated[
+        IAuthorizationService, Depends(get_authorization_service)
+    ],
+    list_orgs_use_case: Annotated[
+        ListOrganizationsUseCase, Depends(get_list_organizations_use_case)
+    ],
+) -> AgentToolRegistry:
+    """Dependency provider for AgentToolRegistry."""
+    from app.application.services.agent_tool_registry import AgentToolRegistry
+
+    return AgentToolRegistry(
+        query_service=query_service,
+        dataset_repository=dataset_repo,
+        authorization_service=auth_service,
+        list_organizations_use_case=list_orgs_use_case,
+    )
+
+
+def get_execute_agent_query_use_case(
+    llm_service: Annotated[LLMProviderService, Depends(get_llm_provider_service)],
+    query_service: Annotated[QueryService, Depends(get_query_service)],
+    dataset_repo: Annotated[IDatasetRepository, Depends(get_dataset_repository)],
+    agent_run_repo: Annotated[
+        IAgentRunRepository, Depends(get_agent_run_repository)
+    ],
+    auth_service: Annotated[
+        IAuthorizationService, Depends(get_authorization_service)
+    ],
+    tool_registry: Annotated[
+        AgentToolRegistry, Depends(get_agent_tool_registry)
+    ],
+) -> ExecuteAgentQueryUseCase:
+    """Dependency provider for ExecuteAgentQueryUseCase."""
+    from app.application.use_cases.execute_agent_query import (
+        ExecuteAgentQueryUseCase,
+    )
+    from app.core.logging import AuditLogger
+
+    return ExecuteAgentQueryUseCase(
+        llm_service=llm_service,
+        query_service=query_service,
+        dataset_repository=dataset_repo,
+        agent_run_repository=agent_run_repo,
+        authorization_service=auth_service,
+        audit_logger=AuditLogger(),
+        tool_registry=tool_registry,
+    )
+
+
+def get_get_agent_run_use_case(
+    agent_run_repo: Annotated[
+        IAgentRunRepository, Depends(get_agent_run_repository)
+    ],
+) -> GetAgentRunUseCase:
+    """Dependency provider for GetAgentRunUseCase."""
+    from app.application.use_cases.get_agent_run import GetAgentRunUseCase
+
+    return GetAgentRunUseCase(agent_run_repo)
+
+
+def get_list_agent_runs_use_case(
+    agent_run_repo: Annotated[
+        IAgentRunRepository, Depends(get_agent_run_repository)
+    ],
+) -> ListAgentRunsUseCase:
+    """Dependency provider for ListAgentRunsUseCase."""
+    from app.application.use_cases.get_agent_run import ListAgentRunsUseCase
+
+    return ListAgentRunsUseCase(agent_run_repo)
+
+
+def get_visualization_service(
+    chart_service: Annotated[ChartService, Depends(get_chart_service)],
+) -> VisualizationService:
+    """Dependency provider for VisualizationService."""
+    from app.application.services.visualization_service import VisualizationService
+
+    return VisualizationService(chart_service=chart_service)
+
+

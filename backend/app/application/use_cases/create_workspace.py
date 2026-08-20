@@ -32,7 +32,7 @@ class CreateWorkspaceUseCase:
         if existing is not None:
             raise DuplicateEntityError("Workspace", dto.slug)
 
-        ws_id = f"ws-{uuid.uuid4()}"
+        ws_id = str(uuid.uuid4())
         workspace = Workspace(
             id=ws_id,
             organization_id=dto.organization_id,

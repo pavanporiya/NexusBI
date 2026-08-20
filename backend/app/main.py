@@ -332,6 +332,7 @@ def create_app() -> FastAPI:
 def _register_routers(app: FastAPI, api_prefix: str) -> None:
     """Mount all API routers under the versioned prefix."""
     from app.api.health import router as health_router
+    from app.api.v1.routers.agents import router as agents_router
     from app.api.v1.routers.auth import router as auth_router
     from app.api.v1.routers.charts import router as charts_router
     from app.api.v1.routers.connectors import router as connectors_router
@@ -357,6 +358,12 @@ def _register_routers(app: FastAPI, api_prefix: str) -> None:
         health_router,
         tags=["System Health (Root)"],
         include_in_schema=False,
+    )
+
+    # Mount AI Agent Gateway REST API endpoints
+    app.include_router(
+        agents_router,
+        prefix=api_prefix,
     )
 
     # Mount Authentication REST API endpoints

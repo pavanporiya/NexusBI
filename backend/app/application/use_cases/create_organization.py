@@ -22,7 +22,7 @@ class CreateOrganizationUseCase:
         if existing is not None:
             raise DuplicateEntityError("Organization", dto.slug)
 
-        org_id = f"org-{uuid.uuid4()}"
+        org_id = str(uuid.uuid4())
         organization = Organization(
             id=org_id,
             name=dto.name,

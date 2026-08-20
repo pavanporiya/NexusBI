@@ -31,8 +31,8 @@ def test_settings() -> Generator[Settings]:
     os.environ["DEBUG"] = "true"
     os.environ["PROJECT_NAME"] = "NexusBI Backend"
     os.environ["SECRET_KEY"] = "test_secret_key_not_for_production"
-    os.environ["POSTGRES_HOST"] = "localhost"
-    os.environ["POSTGRES_DB"] = "nexusbi_testing"
+    os.environ["POSTGRES_HOST"] = os.getenv("POSTGRES_HOST", "localhost")
+    os.environ["POSTGRES_DB"] = os.getenv("POSTGRES_DB", "nexusbi_metadata")
     os.environ["ENABLE_REQUEST_LOGGING"] = "true"
 
     from app.core.config import get_settings

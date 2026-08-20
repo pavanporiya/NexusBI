@@ -53,7 +53,7 @@ class CreateRoleUseCase:
                 if pid not in found_keys:
                     raise EntityNotFoundError("Permission", pid)
 
-        role_id = f"role-{uuid.uuid4()}"
+        role_id = str(uuid.uuid4())
         new_role = Role(
             id=role_id,
             name=dto.name,

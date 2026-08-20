@@ -132,4 +132,4 @@ class QueryResult:
     column_types: dict[str, str]
     execution_time: float
     row_count: int
-    metadata: QueryMetadata
+    metadata: QueryMetadata = field(default_factory=QueryMetadata)
