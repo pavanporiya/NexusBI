@@ -289,6 +289,32 @@ def setup_middleware(app: FastAPI) -> None:
     # 5. Response compression
     app.add_middleware(GZipMiddleware, minimum_size=1000)
 
+    # 4b. Rate limiting (Redis-backed with memory fallback)
+    # Skip rate limiting in test environment
+    if settings.ENV != "testing":
+        try:
+            import redis as _redis
+
+            _redis_client = _redis.Redis.from_url(
+                settings.redis_url,
+                decode_responses=True,
+                socket_connect_timeout=2,
+            )
+            _redis_client.ping()
+        except Exception:
+            _redis_client = None
+
+        from app.core.rate_limit import RateLimitMiddleware
+
+        app.add_middleware(
+            RateLimitMiddleware,
+            default_limit=settings.RATE_LIMIT_REQUESTS_PER_MINUTE,
+            login_limit=10,
+            agent_limit=settings.RATE_LIMIT_AGENT_REQUESTS_PER_MINUTE,
+            window_seconds=60,
+            redis_client=_redis_client,
+        )
+
     # 4. Security headers
     app.add_middleware(SecurityHeadersMiddleware)
 
